@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lernraum">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#35591f">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Arbeitsprotokoll Lernraum</title>
+<style>
+:root{
+  --bg:#f3f5f1; --karte:#ffffff; --text:#1d241b; --gedaempft:#5d6858;
+  --akzent:#35591f; --akzent-hell:#4d7f2d; --rand:#d6ddd1;
+  --ziel:#92D050; --ziel-hell:#eef7e3; --refl:#F6C5AC; --refl-hell:#fdf1ea;
+  --ok:#1e7f4f; --warn:#8a4b00; --fehler:#b3352c;
+  --radius:14px; --tap:48px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+     background:var(--bg);color:var(--text);font-size:18px;line-height:1.5}
+.huelle{max-width:860px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 64px calc(16px + env(safe-area-inset-left))}
+.schritte li{margin:.35em 0}
+details.meldung summary{cursor:pointer;font-weight:600}
+body.breit .huelle{max-width:1200px}
+h1{font-size:1.45rem;margin:.1em 0}
+h2{font-size:1.2rem;margin:.1em 0 .5em}
+h3{font-size:1.05rem;margin:.9em 0 .3em}
+p{margin:.4em 0}
+hr{border:0;border-top:1px solid var(--rand);margin:18px 0}
+.kopf{margin-bottom:12px}
+.karte{background:var(--karte);border:1px solid var(--rand);border-radius:var(--radius);
+       padding:18px;margin-bottom:14px}
+.karte.ohne-polster{padding:0;overflow:hidden}
+.band{padding:10px 18px;font-weight:650}
+.band.ziel{background:var(--ziel)}
+.band.refl{background:var(--refl)}
+.innen{padding:6px 18px 18px}
+button,.knopf{font:inherit;min-height:var(--tap);padding:11px 18px;border-radius:10px;
+       border:1px solid var(--rand);background:var(--karte);color:var(--text);cursor:pointer;
+       display:inline-flex;align-items:center;justify-content:center;gap:8px}
+button:active,.knopf:active{transform:translateY(1px)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{
+       outline:3px solid var(--akzent-hell);outline-offset:2px}
+button[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.primaer{background:var(--akzent);border-color:var(--akzent);color:#fff;font-weight:600}
+.gross{width:100%;font-size:1.1rem;min-height:58px}
+.klein{min-height:40px;padding:6px 12px;font-size:.92rem}
+.link{background:none;border:0;padding:0;min-height:40px;color:var(--akzent);
+      text-decoration:underline;font-weight:600;text-align:left;justify-content:flex-start}
+.zeile{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.abstand{margin-top:14px}
+.gedaempft{color:var(--gedaempft);font-size:.92rem}
+.meldung{margin:10px 0;padding:12px 14px;border-radius:10px;background:#e6f4ec;color:var(--ok)}
+.meldung.warn{background:#fdf0dc;color:var(--warn)}
+.meldung.fehler{background:#fbeceb;color:var(--fehler)}
+.verborgen{display:none !important}
+.feldname{display:block;font-weight:600;margin:14px 0 6px}
+input[type=text],input[type=date],input[type=password],select,textarea{font:inherit;
+  min-height:var(--tap);padding:10px 12px;border:1px solid #b9c3b3;border-radius:10px;
+  width:100%;background:#fff;color:var(--text)}
+textarea{min-height:110px;resize:vertical}
+.datei-eingabe{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.zwei{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:600px){.zwei{grid-template-columns:1fr}}
+.filter{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.wahlen{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wahl{width:100%;flex-direction:column;align-items:flex-start;gap:0;text-align:left;min-height:64px}
+.wahl[aria-pressed=true]{border:2px solid var(--akzent);background:var(--ziel-hell);font-weight:650}
+.wahl small{font-weight:400;color:var(--gedaempft);font-size:.82rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 10px}
+.chip{min-height:42px;padding:6px 12px;border-radius:99px;font-size:.92rem;background:var(--ziel-hell)}
+.zaehler{font-size:.85rem;color:var(--gedaempft);text-align:right}
+.smileys{display:flex;gap:12px;flex-wrap:wrap}
+.smiley{flex-direction:column;min-width:110px;padding:10px 12px;gap:4px}
+.smiley svg{filter:grayscale(1);opacity:.5}
+.smiley[aria-pressed=true]{border:2px solid var(--akzent);background:var(--refl-hell);font-weight:650}
+.smiley[aria-pressed=true] svg{filter:none;opacity:1}
+.svg{display:inline-flex;vertical-align:middle}
+.zitat{background:var(--ziel-hell);border-left:5px solid var(--ziel);padding:10px 14px;
+       border-radius:6px;white-space:pre-wrap}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 14px}
+.slot{border:1px solid var(--rand);border-radius:10px;padding:10px 12px}
+.slot b{display:block}
+.slot.leer{background:#f7f8f6}
+.slot.halb{background:#fdf0dc;border-color:#e9c48a}
+.slot.fertig{background:#e6f4ec;border-color:#9fd0b4}
+/* Protokollkarte im Stil der Papiervorlage */
+.protokoll{background:#fff;border:1.5px solid #2b2b2b;margin-bottom:16px;
+           break-inside:avoid;page-break-inside:avoid}
+.protokoll .k{padding:5px 10px;font-weight:600;border-bottom:1px solid #2b2b2b}
+.protokoll .k.ziel{background:var(--ziel)}
+.protokoll .k.refl{background:var(--refl)}
+.protokoll .z2{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #2b2b2b}
+.protokoll .z2>div{padding:7px 10px}
+.protokoll .z2>div+div{border-left:1px solid #2b2b2b}
+.protokoll .f{padding:7px 10px;border-bottom:1px solid #2b2b2b}
+.protokoll .lbl{display:block;font-size:.85rem;color:var(--gedaempft)}
+.protokoll .txt{white-space:pre-wrap;margin:.1em 0}
+.protokoll .stempel{display:block;font-size:.78rem;color:var(--gedaempft)}
+.protokoll .marken{display:flex;flex-wrap:wrap;gap:6px;padding:7px 10px}
+.protokoll > :last-child{border-bottom:0}
+.marke{display:inline-block;font-size:.8rem;padding:2px 9px;border-radius:99px;background:#eef1f5;color:#384150}
+.marke.warn{background:#fde6c8;color:#7a3f00}
+.marke.ok{background:#e6f4ec;color:var(--ok)}
+.zmini{display:inline-flex;gap:10px;align-items:center;white-space:nowrap}
+.tabelle-huelle{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--rand);vertical-align:top}
+th{background:#f0f3ee;white-space:nowrap}
+.zahl{text-align:center}
+.raster th:first-child,.raster td:first-child{position:sticky;left:0;background:#fff;z-index:1;min-width:150px}
+.raster th:first-child{background:#f0f3ee}
+.r{display:block;min-width:52px;padding:1px 4px;margin:2px 0;border-radius:6px;font-size:.82rem;
+   text-align:center;white-space:nowrap}
+.r-leer{color:#9aa39a;background:#f5f6f4}
+.r-halb{background:#fdf0dc;color:var(--warn)}
+.r-fertig{background:#e6f4ec;color:var(--ok)}
+.r-warn{box-shadow:inset 0 0 0 2px #d9822b}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs button[aria-pressed=true]{background:var(--akzent);color:#fff;border-color:var(--akzent)}
+.ablage{border:2px dashed #b9c3b3;border-radius:12px;padding:18px;text-align:center;margin:10px 0}
+.ablage.aktiv{background:var(--ziel-hell);border-color:var(--akzent)}
+.fuss{margin-top:26px;text-align:center}
+.dialog-hg{position:fixed;inset:0;background:rgba(20,28,18,.45);display:flex;
+           align-items:center;justify-content:center;padding:20px;z-index:50}
+.dialog{background:#fff;border-radius:var(--radius);padding:20px;max-width:460px;width:100%}
+.nur-druck{display:none}
+@media print{
+  body{background:#fff;font-size:11pt}
+  button,.knopf,.nicht-drucken{display:none !important}
+  .nur-druck{display:block}
+  .karte{border:0;padding:0;margin:0 0 8px}
+  .huelle,body.breit .huelle{max-width:none;padding:0}
+  .tabelle-huelle{overflow:visible}
+  .protokoll{margin-bottom:10px}
+  .protokoll .k,.marke,.r{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="huelle">
+  <header class="kopf nicht-drucken">
+    <h1 id="titel">Arbeitsprotokoll Lernraum</h1>
+    <p class="gedaempft" id="untertitel"></p>
+  </header>
+  <div id="warnung" class="nicht-drucken"></div>
+  <main id="buehne"></main>
+</div>
+
+<script>
+/* ========================================================================
+   1. EINSTELLUNGEN — nur dieser Block wird angepasst.
+   Die Logik darunter kennt keine konkreten Texte oder Zeiten.
+   ======================================================================== */
+const DATEN = {
+  titel: "Arbeitsprotokoll Lernraum",
+
+  // PIN für den Bereich «Für die Lehrperson». Vor dem Einsatz ändern.
+  // Achtung: Der PIN steht im Quelltext. Er schützt vor versehentlichem Öffnen, nicht vor Absicht.
+  lehrerPin: "5827",
+
+  // Zeitfenster: Pro Datum ist jedes Zeitfenster genau EINMAL möglich.
+  // beginn/ende steuern den Vorschlag beim Ausfüllen und die Hinweise für die Lehrperson
+  // («nachgetragen», «Reflexion verspätet»). Format "HH:MM".
+  zeitfenster: [
+    { id: "VM", kurz: "VM", bezeichnung: "Vormittag",  beginn: "07:00", ende: "12:00" },
+    { id: "NM", kurz: "NM", bezeichnung: "Nachmittag", beginn: "12:00", ende: "17:00" }
+  ],
+  maxEintraegeProTag: 2,
+
+  nachfristMinuten: 60,            // so lange nach Ende des Zeitfensters gilt ein Eintrag als pünktlich
+  mindestMinutenBisReflexion: 20,  // Reflexion früher als das nach dem Ziel → Hinweis
+  mindestZeichenZiel: 15,          // Mindestlänge «Ich plane heute …»
+  mindestZeichenAendern: 3,        // Mindestlänge «Was muss ich ändern?» («Nichts.» geht)
+  erinnerungNachTagen: 7,          // Erinnerung an die Abgabe-Datei nach so vielen Tagen
+
+  // Beschriftungen wie auf der Papiervorlage
+  texte: {
+    zielTitel: "Zielsetzung (Beginn der Lektionen)",
+    planen: "Ich plane heute …",
+    reflexionTitel: "Reflexion (Ende der Lektionen)",
+    zufrieden: "Zufrieden?",
+    aendern: "Was muss ich ändern?",
+    bemerkungen: "Bemerkungen"
+  },
+
+  // Satzanfänge als Tipp-Hilfe beim Ziel (eine Zeile pro Satzanfang)
+  satzanfaenge: [
+    "Ich arbeite an ",
+    "Ich mache fertig: ",
+    "Ich übe ",
+    "Ich lerne für ",
+    "Ich brauche Hilfe bei "
+  ],
+
+  // Zufriedenheit: Werte 1–3 sind fest mit den Smiley-Grafiken verbunden.
+  // Text und Emoji (erscheint in der Word-Datei) sind frei.
+  zufriedenheit: [
+    { wert: 1, text: "zufrieden",       emoji: "🙂" },
+    { wert: 2, text: "teilweise",       emoji: "😐" },
+    { wert: 3, text: "nicht zufrieden", emoji: "🙁" }
+  ],
+
+  // Schlüssel für die Prüfsumme der Word-Dateien. Während des Schuljahres NICHT ändern,
+  // sonst gelten alle älteren Word-Dateien als «verändert».
+  pruefsummenSchluessel: "Lernraum-Protokoll-2026"
+};
+
+const APP_KENNUNG = "Lernraum-Protokoll";
+const SCHLUESSEL = "lernraumProtokoll.v1";
+const LEHRER_SCHLUESSEL = "lernraumProtokoll.lehrerAuswertung.v1";
+const DOCX_TYP = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+/* iPadOS meldet sich als «Macintosh» – erkennbar am Touchscreen */
+const IST_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const ALS_APP = window.navigator.standalone === true ||
+  !!(window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+const IM_WEB = /^https?:$/.test(location.protocol);
+const DRUCKEN_MOEGLICH = !(IST_IOS && ALS_APP);   // window.print() fehlt in iPad-Home-Bildschirm-Apps
+
+/* ========================================================================
+   2. SPEICHER — localStorage, wenn vorhanden, sonst nur Arbeitsspeicher.
+   Es wird nie etwas über das Netz übertragen.
+   ======================================================================== */
+const Speicher = (() => {
+  let vorhanden = false;
+  const ersatz = {};
+  try {
+    const p = "__lr_test__";
+    window.localStorage.setItem(p, "1");
+    window.localStorage.removeItem(p);
+    vorhanden = true;
+  } catch (e) { vorhanden = false; }
+  return {
+    dauerhaft: vorhanden,
+    lies(schluessel, standard) {
+      try {
+        const roh = vorhanden ? window.localStorage.getItem(schluessel) : ersatz[schluessel];
+        return roh == null ? standard : JSON.parse(roh);
+      } catch (e) { return standard; }
+    },
+    schreib(schluessel, wert) {
+      try {
+        const roh = JSON.stringify(wert);
+        if (vorhanden) window.localStorage.setItem(schluessel, roh);
+        else ersatz[schluessel] = roh;
+        return true;
+      } catch (e) { return false; }
+    },
+    loesche(schluessel) {
+      try {
+        if (vorhanden) window.localStorage.removeItem(schluessel);
+        else delete ersatz[schluessel];
+      } catch (e) {}
+    }
+  };
+})();
+// Browser bitten, die Daten nicht automatisch aufzuräumen (wo unterstützt)
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch (e) {}
+
+/* ========================================================================
+   3. HILFSMITTEL
+   ======================================================================== */
+const $ = (sel, wurzel = document) => wurzel.querySelector(sel);
+const buehne = $("#buehne");
+/* Statt buehne.append(): flacht Listen ab und überspringt null (append würde «null» schreiben). */
+function zeige(...kinder) {
+  for (const k of kinder.flat(Infinity)) if (k != null && k !== false) buehne.append(k);
+}
+
+function el(tag, attribute = {}, ...kinder) {
+  const k = document.createElement(tag);
+  for (const [n, w] of Object.entries(attribute)) {
+    if (n === "class") k.className = w;
+    else if (n.startsWith("on")) k.addEventListener(n.slice(2).toLowerCase(), w);
+    else if (w !== null && w !== undefined) k.setAttribute(n, w);
+  }
+  for (const kind of kinder.flat(Infinity)) {
+    if (kind == null || kind === false) continue;
+    k.append(kind instanceof Node ? kind : document.createTextNode(String(kind)));
+  }
+  return k;
+}
+
+/* Nur für feste Grafiken aus diesem Code – nie für Eingaben der Lernenden. */
+function svgKnoten(markup) {
+  const s = document.createElement("span");
+  s.className = "svg";
+  s.innerHTML = markup;
+  return s;
+}
+
+function smileySvg(wert, groesse) {
+  const mund = { 1: "M14 26 Q22 34 30 26", 2: "M14 29 H30", 3: "M14 31 Q22 23 30 31" }[wert] || "M14 29 H30";
+  const farbe = { 1: "#8fcb4f", 2: "#f2c94c", 3: "#ef8a6b" }[wert] || "#dddddd";
+  return `<svg viewBox="0 0 44 44" width="${groesse}" height="${groesse}" aria-hidden="true">
+    <circle cx="22" cy="22" r="19" fill="${farbe}" stroke="#333" stroke-width="2"/>
+    <circle cx="15.5" cy="17" r="2.4" fill="#333"/><circle cx="28.5" cy="17" r="2.4" fill="#333"/>
+    <path d="${mund}" fill="none" stroke="#333" stroke-width="2.6" stroke-linecap="round"/></svg>`;
+}
+
+/* Ersatz für confirm(): eingebettete Ansichten blockieren Browserdialoge. */
+function frage(inhalt, beiJa, jaText = "Ja", neinText = "Abbrechen") {
+  if (document.querySelector(".dialog-hg")) return;   // kein Doppeltippen
+  const hg = el("div", { class: "dialog-hg nicht-drucken", role: "dialog", "aria-modal": "true" });
+  const taste = ev => { if (ev.key === "Escape") zu(); };
+  const zu = () => { hg.remove(); document.removeEventListener("keydown", taste); };
+  const ja = el("button", { class: "primaer", onclick: () => { zu(); beiJa(); } }, jaText);
+  hg.append(el("div", { class: "dialog" },
+    typeof inhalt === "string" ? el("p", {}, inhalt) : inhalt,
+    el("div", { class: "zeile abstand" }, ja, el("button", { onclick: zu }, neinText))));
+  document.body.append(hg);
+  document.addEventListener("keydown", taste);
+  ja.focus();
+}
+
+const p2 = n => String(n).padStart(2, "0");
+/* Lokales Datum – NICHT toISOString(), das rechnet in UTC und liefert kurz nach Mitternacht den Vortag. */
+function isoDatum(d = new Date()) { return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; }
+function datumCH(iso) { const [j, m, t] = String(iso).split("-"); return j && m && t ? `${t}.${m}.${j}` : String(iso); }
+function datumLang(iso) {
+  const d = new Date(`${iso}T12:00:00`);
+  return isNaN(d) ? String(iso) : d.toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "2-digit", year: "numeric" });
+}
+function kurzDatum(iso) {
+  const d = new Date(`${iso}T12:00:00`);
+  if (isNaN(d)) return String(iso);
+  return `${d.toLocaleDateString("de-CH", { weekday: "short" })} ${p2(d.getDate())}.${p2(d.getMonth() + 1)}.`;
+}
+function zeitCH(stempel) {
+  const d = new Date(stempel);
+  if (!stempel || isNaN(d)) return "–";
+  return `${p2(d.getDate())}.${p2(d.getMonth() + 1)}.${d.getFullYear()}, ${p2(d.getHours())}:${p2(d.getMinutes())}`;
+}
+/* Datum + "HH:MM" → Millisekunden in lokaler Zeit */
+function zeitpunkt(tag, hhmm) { return new Date(`${tag}T${hhmm}:00`).getTime(); }
+
+function zeitfensterVon(id) { return DATEN.zeitfenster.find(z => z.id === id); }
+function zfName(id) { const z = zeitfensterVon(id); return z ? z.bezeichnung : String(id || "–"); }
+function zfIndex(id) { const i = DATEN.zeitfenster.findIndex(z => z.id === id); return i < 0 ? 99 : i; }
+function nachZeit(a, b) {
+  if (a.datum !== b.datum) return a.datum < b.datum ? -1 : 1;
+  return zfIndex(a.zeitfenster) - zfIndex(b.zeitfenster);
+}
+function kuerzen(t, n) { t = String(t || ""); return t.length > n ? t.slice(0, n - 1) + "…" : t; }
+
+function neueId() {
+  const b = new Uint8Array(8);
+  try { crypto.getRandomValues(b); } catch (e) { for (let i = 0; i < 8; i++) b[i] = Math.random() * 256 | 0; }
+  return Array.from(b, x => x.toString(16).padStart(2, "0")).join("");
+}
+function dateinameTeil(t) {
+  return String(t).trim()
+    .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue")
+    .replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue")
+    .replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "ohne-Angabe";
+}
+function schluesselPerson(name, klasse) {
+  return `${String(name).trim().toLowerCase().replace(/\s+/g, " ")}|${String(klasse).trim().toLowerCase().replace(/\s+/g, "")}`;
+}
+
+function herunterladen(dateiname, inhalt, typ) {
+  const url = URL.createObjectURL(new Blob([inhalt], { type: typ }));
+  const a = el("a", { href: url, download: dateiname });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+function csvHerunterladen(dateiname, zeilen) {
+  const zelle = f => {
+    let s = String(f == null ? "" : f);
+    if (/^([=+@]|-(?!\s))/.test(s)) s = "'" + s;   // keine Formeln in Excel einschleusen
+    return `"${s.replace(/"/g, '""')}"`;
+  };
+  herunterladen(dateiname, "\uFEFF" + zeilen.map(z => z.map(zelle).join(";")).join("\r\n"), "text/csv;charset=utf-8");
+}
+
+
+/* SHA-256 ohne externe Bibliothek (crypto.subtle fehlt bei file:// in manchen Browsern).
+   Dient als Prüfsumme: erkennt, ob eine Abgabe-Datei von Hand verändert wurde. */
+function sha256(text) {
+  const K = [], H = [];
+  for (let n = 2, c = 0; c < 64; n++) {
+    let prim = true;
+    for (let t = 2; t * t <= n; t++) if (n % t === 0) { prim = false; break; }
+    if (!prim) continue;
+    if (c < 8) H[c] = (Math.pow(n, 1 / 2) * 4294967296) | 0;
+    K[c++] = (Math.pow(n, 1 / 3) * 4294967296) | 0;
+  }
+  const bytes = new TextEncoder().encode(text);
+  const l = bytes.length;
+  const laenge = ((l + 9 + 63) >> 6) << 6;
+  const buf = new Uint8Array(laenge);
+  buf.set(bytes); buf[l] = 0x80;
+  const dv = new DataView(buf.buffer);
+  dv.setUint32(laenge - 4, (l * 8) >>> 0);
+  dv.setUint32(laenge - 8, Math.floor(l / 536870912));
+  const W = new Int32Array(64);
+  const rotr = (x, s) => (x >>> s) | (x << (32 - s));
+  for (let o = 0; o < laenge; o += 64) {
+    for (let i = 0; i < 16; i++) W[i] = dv.getInt32(o + i * 4);
+    for (let i = 16; i < 64; i++) {
+      const x = W[i - 15], y = W[i - 2];
+      W[i] = (W[i - 16] + (rotr(x, 7) ^ rotr(x, 18) ^ (x >>> 3)) + W[i - 7] +
+              (rotr(y, 17) ^ rotr(y, 19) ^ (y >>> 10))) | 0;
+    }
+    let [a, b, c, d, e, f, g, h] = H;
+    for (let i = 0; i < 64; i++) {
+      const t1 = (h + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + W[i]) | 0;
+      const t2 = ((rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
+    H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+  }
+  return H.map(x => (x >>> 0).toString(16).padStart(8, "0")).join("");
+}
+function pruefsummeVon(d) {
+  return sha256(DATEN.pruefsummenSchluessel + "|" + JSON.stringify(
+    { profil: d.profil, exportiert: d.exportiert, eintraege: d.eintraege, textSignatur: d.textSignatur }));
+}
+
+/* ========================================================================
+   WORD-DATEI (.docx) — ohne Bibliothek erzeugt und gelesen.
+   Eine .docx ist ein ZIP-Archiv mit XML-Dateien. Die Originaldaten stecken
+   zusätzlich unsichtbar im Dokument (customXml), zusammen mit einer Prüfsumme
+   über den sichtbaren Text. So erkennt der Bereich für die Lehrperson, ob im
+   Word nachträglich etwas geändert wurde.
+   ======================================================================== */
+const CRC_TABELLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(b) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < b.length; i++) c = CRC_TABELLE[(c ^ b[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+/* ZIP ohne Kompression (Methode «stored») – Word liest das problemlos. */
+function zipErstellen(dateien) {
+  const enc = new TextEncoder(), d = new Date();
+  const zeit = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+  const datum = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+  const lokal = [], zentral = [];
+  let offset = 0;
+  for (const f of dateien) {
+    const name = enc.encode(f.name), crc = crc32(f.daten), n = f.daten.length;
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true);
+    h.setUint16(8, 0, true); h.setUint16(10, zeit, true); h.setUint16(12, datum, true);
+    h.setUint32(14, crc, true); h.setUint32(18, n, true); h.setUint32(22, n, true);
+    h.setUint16(26, name.length, true); h.setUint16(28, 0, true);
+    lokal.push(new Uint8Array(h.buffer), name, f.daten);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true);
+    c.setUint16(8, 0x0800, true); c.setUint16(10, 0, true); c.setUint16(12, zeit, true);
+    c.setUint16(14, datum, true); c.setUint32(16, crc, true); c.setUint32(20, n, true);
+    c.setUint32(24, n, true); c.setUint16(28, name.length, true); c.setUint32(42, offset, true);
+    zentral.push(new Uint8Array(c.buffer), name);
+    offset += 30 + name.length + n;
+  }
+  const cdGroesse = zentral.reduce((sum, x) => sum + x.length, 0);
+  const e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, dateien.length, true); e.setUint16(10, dateien.length, true);
+  e.setUint32(12, cdGroesse, true); e.setUint32(16, offset, true);
+  const teile = [...lokal, ...zentral, new Uint8Array(e.buffer)];
+  const alles = new Uint8Array(teile.reduce((sum, x) => sum + x.length, 0));
+  let pos = 0;
+  for (const t of teile) { alles.set(t, pos); pos += t.length; }
+  return alles;
+}
+/* ZIP lesen – auch Dateien, die Word neu (komprimiert) gespeichert hat. */
+async function zipLesen(bytes) {
+  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let eocd = -1;
+  for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 65557); i--) {
+    if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error("keinWord");
+  const anzahl = dv.getUint16(eocd + 10, true);
+  let o = dv.getUint32(eocd + 16, true);
+  const verzeichnis = {};
+  for (let i = 0; i < anzahl; i++) {
+    if (dv.getUint32(o, true) !== 0x02014b50) throw new Error("keinWord");
+    const nl = dv.getUint16(o + 28, true), xl = dv.getUint16(o + 30, true), kl = dv.getUint16(o + 32, true);
+    const name = new TextDecoder().decode(bytes.subarray(o + 46, o + 46 + nl));
+    verzeichnis[name] = { methode: dv.getUint16(o + 10, true), groesse: dv.getUint32(o + 20, true), lokal: dv.getUint32(o + 42, true) };
+    o += 46 + nl + xl + kl;
+  }
+  async function roh(name) {
+    const v = verzeichnis[name];
+    if (!v) return null;
+    const start = v.lokal + 30 + dv.getUint16(v.lokal + 26, true) + dv.getUint16(v.lokal + 28, true);
+    const daten = bytes.subarray(start, start + v.groesse);
+    if (v.methode === 0) return daten;
+    if (v.methode === 8) {
+      if (typeof DecompressionStream === "undefined") throw new Error("entpacken");
+      const strom = new Blob([daten]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      return new Uint8Array(await new Response(strom).arrayBuffer());
+    }
+    throw new Error("entpacken");
+  }
+  return {
+    namen: Object.keys(verzeichnis),
+    async text(name) { const d = await roh(name); return d ? new TextDecoder().decode(d) : null; }
+  };
+}
+function textZuBase64(t) {
+  const b = new TextEncoder().encode(t);
+  let bin = "";
+  for (let i = 0; i < b.length; i += 0x8000) bin += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+function base64ZuText(b64) {
+  const bin = atob(b64), b = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(b);
+}
+function dateiPuffer(datei) {
+  return new Promise((ok, nein) => {
+    const r = new FileReader();
+    r.onload = () => ok(r.result);
+    r.onerror = () => nein(r.error);
+    r.readAsArrayBuffer(datei);
+  });
+}
+
+/* Bausteine für WordprocessingML */
+const W = {
+  esc: t => String(t == null ? "" : t)
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\uFFFE\uFFFF]/g, "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"),
+  run(text, o = {}) {
+    const rpr = (o.b ? "<w:b/>" : "") + (o.farbe ? `<w:color w:val="${o.farbe}"/>` : "") +
+      (o.groesse ? `<w:sz w:val="${o.groesse}"/><w:szCs w:val="${o.groesse}"/>` : "");
+    const inhalt = String(text == null ? "" : text).split(/\r?\n/)
+      .map((t, i) => (i ? "<w:br/>" : "") + `<w:t xml:space="preserve">${W.esc(t)}</w:t>`).join("");
+    return `<w:r>${rpr ? `<w:rPr>${rpr}</w:rPr>` : ""}${inhalt}</w:r>`;
+  },
+  p(runs, o = {}) {
+    let ppr = "";
+    if (o.stil) ppr += `<w:pStyle w:val="${o.stil}"/>`;
+    if (o.zusammen) ppr += "<w:keepNext/>";
+    if (o.umbruch) ppr += "<w:pageBreakBefore/>";
+    if (o.vor != null || o.nach != null)
+      ppr += `<w:spacing${o.vor != null ? ` w:before="${o.vor}"` : ""}${o.nach != null ? ` w:after="${o.nach}"` : ""}/>`;
+    return `<w:p>${ppr ? `<w:pPr>${ppr}</w:pPr>` : ""}${[].concat(runs).join("")}</w:p>`;
+  },
+  zelle(absaetze, o = {}) {
+    return `<w:tc><w:tcPr><w:tcW w:w="${o.breite}" w:type="dxa"/>${o.span ? `<w:gridSpan w:val="${o.span}"/>` : ""}` +
+      `${o.farbe ? `<w:shd w:val="clear" w:color="auto" w:fill="${o.farbe}"/>` : ""}</w:tcPr>${[].concat(absaetze).join("")}</w:tc>`;
+  },
+  zeile(zellen, o = {}) {
+    return `<w:tr><w:trPr><w:cantSplit/>${o.kopf ? "<w:tblHeader/>" : ""}</w:trPr>${zellen.join("")}</w:tr>`;
+  },
+  tabelle(spalten, zeilen) {
+    const breite = spalten.reduce((a, b) => a + b, 0);
+    const rand = ["top", "left", "bottom", "right", "insideH", "insideV"]
+      .map(r => `<w:${r} w:val="single" w:sz="6" w:space="0" w:color="333333"/>`).join("");
+    return `<w:tbl><w:tblPr><w:tblW w:w="${breite}" w:type="dxa"/><w:tblBorders>${rand}</w:tblBorders>` +
+      `<w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="45" w:type="dxa"/><w:left w:w="100" w:type="dxa"/>` +
+      `<w:bottom w:w="45" w:type="dxa"/><w:right w:w="100" w:type="dxa"/></w:tblCellMar></w:tblPr>` +
+      `<w:tblGrid>${spalten.map(c => `<w:gridCol w:w="${c}"/>`).join("")}</w:tblGrid>${zeilen.join("")}</w:tbl>`;
+  }
+};
+
+/* Sichtbarer Text eines Word-Dokuments, ohne Leerraum – Grundlage der Text-Signatur. */
+function wordText(xml) {
+  let t = "";
+  String(xml).replace(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g, (_, inhalt) => { t += inhalt; return ""; });
+  return t.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, z) => String.fromCodePoint(+z))
+    .replace(/&amp;/g, "&").normalize("NFC").replace(/\s+/g, "");
+}
+
+function wordDokumentXml(profil, eintraege, exportiert) {
+  const liste = eintraege.slice().sort(nachZeit);
+  const grau = "666666", orange = "8A4B00", voll = 9638, halb = 4819;
+  const zufr = e => DATEN.zufriedenheit.find(z => z.wert === e.zufrieden);
+  const warnAnzahl = liste.reduce((n, e) => n + warnungen(e, eintraege).length, 0);
+  const K = [];
+  K.push(W.p(W.run(DATEN.titel), { stil: "Titel" }));
+  K.push(W.p([W.run("Name: ", { b: true }), W.run(profil.name), W.run("     Klasse: ", { b: true }), W.run(profil.klasse)]));
+  K.push(W.p([W.run("Zeitraum: ", { b: true }),
+    W.run(liste.length ? `${datumCH(liste[0].datum)} bis ${datumCH(liste[liste.length - 1].datum)}` : "–"),
+    W.run("     Einträge: ", { b: true }), W.run(liste.length)]));
+  K.push(W.p([W.run("Reflexion fehlt: ", { b: true }), W.run(liste.filter(e => !e.reflexionErfasst).length),
+    W.run("     Hinweise: ", { b: true }), W.run(warnAnzahl)]));
+  K.push(W.p(W.run(`Erstellt am ${zeitCH(exportiert)} mit dem Lernraum-Protokoll. Ob dieses Dokument nachträglich ` +
+    "verändert wurde, lässt sich in der App im Bereich «Für die Lehrperson» prüfen.", { farbe: grau, groesse: 17 }), { vor: 100, nach: 60 }));
+
+  // Übersicht
+  K.push(W.p(W.run("Übersicht"), { stil: "berschrift1" }));
+  if (liste.length) {
+    const sp = [1450, 1200, 4038, 1450, 1500];
+    const kopf = W.zeile(["Datum", "Zeitfenster", DATEN.texte.planen.replace(/\s*…$/, ""), "Zufrieden", "Hinweise"]
+      .map((t, i) => W.zelle(W.p(W.run(t, { b: true, groesse: 18 })), { breite: sp[i], farbe: "E7ECE3" })), { kopf: true });
+    const zeilen = liste.map(e => {
+      const z = zufr(e), h = warnungen(e, eintraege).map(x => x.kurz);
+      return W.zeile([
+        W.zelle(W.p(W.run(datumCH(e.datum), { groesse: 18 })), { breite: sp[0] }),
+        W.zelle(W.p(W.run(zfName(e.zeitfenster), { groesse: 18 })), { breite: sp[1] }),
+        W.zelle(W.p(W.run(kuerzen(String(e.ziel).replace(/\s+/g, " "), 90), { groesse: 18 })), { breite: sp[2] }),
+        W.zelle(W.p(W.run(z ? `${z.emoji} ${z.text}` : "–", { groesse: 18 })), { breite: sp[3] }),
+        W.zelle(W.p(W.run(h.length ? h.join(", ") : "–", { groesse: 16, farbe: h.length ? orange : grau })),
+          { breite: sp[4], farbe: h.length ? "FDE6C8" : null })
+      ]);
+    });
+    K.push(W.tabelle(sp, [kopf, ...zeilen]));
+  } else {
+    K.push(W.p(W.run("Noch keine Einträge.")));
+  }
+
+  // Protokolle im Stil der Papiervorlage
+  if (liste.length) K.push(W.p(W.run("Protokolle"), { stil: "berschrift1", umbruch: true }));
+  const z = { zusammen: true };
+  const lbl = t => W.p(W.run(t, { farbe: grau, groesse: 17 }), z);
+  const stempel = t => W.p(W.run(`erfasst: ${zeitCH(t)}`, { farbe: grau, groesse: 16 }), z);
+  liste.forEach(e => {
+    const zeilen = [];
+    zeilen.push(W.zeile([W.zelle(W.p(W.run(DATEN.texte.zielTitel, { b: true }), z), { breite: voll, span: 2, farbe: "92D050" })]));
+    zeilen.push(W.zeile([
+      W.zelle(W.p([W.run("Datum: ", { b: true }), W.run(datumLang(e.datum))], z), { breite: halb }),
+      W.zelle(W.p([W.run("Zeitfenster: ", { b: true }), W.run(zfName(e.zeitfenster))], z), { breite: halb })]));
+    zeilen.push(W.zeile([W.zelle([lbl(DATEN.texte.planen), W.p(W.run(e.ziel), z), stempel(e.zielErfasst)], { breite: voll, span: 2 })]));
+    zeilen.push(W.zeile([W.zelle(W.p(W.run(DATEN.texte.reflexionTitel, { b: true }), z), { breite: voll, span: 2, farbe: "F6C5AC" })]));
+    if (e.reflexionErfasst) {
+      const zf = zufr(e);
+      zeilen.push(W.zeile([
+        W.zelle([lbl(DATEN.texte.zufrieden), W.p(W.run(zf ? `${zf.emoji} ${zf.text}` : "–", { b: true }), z)], { breite: halb }),
+        W.zelle([lbl(DATEN.texte.aendern), W.p(W.run(e.aendern || "–"), z)], { breite: halb })]));
+      zeilen.push(W.zeile([W.zelle([lbl(DATEN.texte.bemerkungen), W.p(W.run(e.bemerkungen || "–"), z),
+        stempel(e.reflexionErfasst)], { breite: voll, span: 2 })]));
+    } else {
+      zeilen.push(W.zeile([W.zelle(W.p(W.run("Noch nicht ausgefüllt.", { farbe: grau }), z), { breite: voll, span: 2 })]));
+    }
+    const h = hinweiseFuer(e, eintraege);
+    if (h.length) zeilen.push(W.zeile([W.zelle(W.p([W.run("Hinweise: ", { b: true, groesse: 17, farbe: orange }),
+      W.run(h.map(x => x.text).join(" · "), { groesse: 17, farbe: orange })], z), { breite: voll, span: 2, farbe: "FDE6C8" })]));
+    // letzte Zeile nicht an das Folgende binden, sonst hängen alle Tabellen aneinander
+    zeilen[zeilen.length - 1] = zeilen[zeilen.length - 1].replace(/<w:keepNext\/>/g, "");
+    K.push(W.tabelle([halb, halb], zeilen));
+    K.push(W.p(W.run(""), { nach: 200 }));
+  });
+
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+    '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" ' +
+    'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>' + K.join("") +
+    '<w:sectPr><w:footerReference w:type="default" r:id="rId3"/><w:pgSz w:w="11906" w:h="16838"/>' +
+    '<w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/>' +
+    '</w:sectPr></w:body></w:document>';
+}
+
+function wordDateiErstellen() {
+  stand = laden();
+  const profil = { name: stand.profil.name, klasse: stand.profil.klasse, geraetId: stand.profil.geraetId };
+  const exportiert = new Date().toISOString();
+  const eintraege = stand.eintraege;
+  const dokument = wordDokumentXml(profil, eintraege, exportiert);
+  const paket = { app: APP_KENNUNG, version: 2, profil, exportiert, eintraege, textSignatur: sha256(wordText(dokument)) };
+  paket.pruefsumme = pruefsummeVon(paket);
+  const pruefnummer = paket.pruefsumme.slice(0, 12).toUpperCase().match(/.{4}/g).join("-");
+  const g = (neueId() + neueId()).toUpperCase();
+  const itemId = `{${g.slice(0, 8)}-${g.slice(8, 12)}-${g.slice(12, 16)}-${g.slice(16, 20)}-${g.slice(20, 32)}}`;
+  const X = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+  const NW = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+  const R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+  const PR = "http://schemas.openxmlformats.org/package/2006/relationships";
+  const w3 = exportiert.replace(/\.\d{3}Z$/, "Z");
+  const fussRun = t => `<w:r><w:rPr><w:color w:val="666666"/><w:sz w:val="16"/><w:szCs w:val="16"/></w:rPr>${t}</w:r>`;
+  const feld = code => fussRun('<w:fldChar w:fldCharType="begin"/>') + fussRun(`<w:instrText xml:space="preserve"> ${code} </w:instrText>`) +
+    fussRun('<w:fldChar w:fldCharType="separate"/>') + fussRun("<w:t>1</w:t>") + fussRun('<w:fldChar w:fldCharType="end"/>');
+  const teile = [
+    ["[Content_Types].xml", X + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+      '<Default Extension="xml" ContentType="application/xml"/>' +
+      '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
+      '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>' +
+      '<Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>' +
+      '<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>' +
+      '<Override PartName="/customXml/itemProps1.xml" ContentType="application/vnd.openxmlformats-officedocument.customXmlProperties+xml"/>' +
+      '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>' +
+      '<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>' +
+      '</Types>'],
+    ["_rels/.rels", X + `<Relationships xmlns="${PR}">` +
+      `<Relationship Id="rId1" Type="${R}/officeDocument" Target="word/document.xml"/>` +
+      `<Relationship Id="rId2" Type="${PR}/metadata/core-properties" Target="docProps/core.xml"/>` +
+      `<Relationship Id="rId3" Type="${R}/extended-properties" Target="docProps/app.xml"/></Relationships>`],
+    ["docProps/core.xml", X + '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" ' +
+      'xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" ' +
+      'xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
+      `<dc:title>${W.esc(`${DATEN.titel} – ${profil.name} (${profil.klasse})`)}</dc:title><dc:creator>Lernraum-Protokoll</dc:creator>` +
+      `<dcterms:created xsi:type="dcterms:W3CDTF">${w3}</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">${w3}</dcterms:modified>` +
+      '</cp:coreProperties>'],
+    ["docProps/app.xml", X + '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">' +
+      '<Application>Lernraum-Protokoll</Application></Properties>'],
+    ["word/document.xml", dokument],
+    ["word/styles.xml", X + `<w:styles ${NW}><w:docDefaults><w:rPrDefault><w:rPr>` +
+      '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="21"/><w:szCs w:val="21"/><w:lang w:val="de-CH"/>' +
+      '</w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>' +
+      '<w:style w:type="paragraph" w:default="1" w:styleId="Standard"><w:name w:val="Normal"/><w:qFormat/></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="Titel"><w:name w:val="Title"/><w:basedOn w:val="Standard"/><w:next w:val="Standard"/><w:qFormat/>' +
+      '<w:pPr><w:spacing w:after="160"/></w:pPr><w:rPr><w:b/><w:sz w:val="36"/><w:szCs w:val="36"/></w:rPr></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="berschrift1"><w:name w:val="heading 1"/><w:basedOn w:val="Standard"/><w:next w:val="Standard"/><w:qFormat/>' +
+      '<w:pPr><w:keepNext/><w:spacing w:before="280" w:after="120"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:style>' +
+      '<w:style w:type="table" w:default="1" w:styleId="NormaleTabelle"><w:name w:val="Normal Table"/><w:uiPriority w:val="99"/><w:semiHidden/>' +
+      '<w:tblPr><w:tblInd w:w="0" w:type="dxa"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/>' +
+      '<w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>'],
+    ["word/settings.xml", X + `<w:settings ${NW}><w:defaultTabStop w:val="708"/><w:characterSpacingControl w:val="doNotCompress"/>` +
+      '<w:compat><w:compatSetting w:name="compatibilityMode" w:uri="http://schemas.microsoft.com/office/word" w:val="15"/></w:compat></w:settings>'],
+    ["word/footer1.xml", X + `<w:ftr ${NW}><w:p><w:pPr><w:tabs><w:tab w:val="right" w:pos="9638"/></w:tabs></w:pPr>` +
+      fussRun(`<w:t xml:space="preserve">${W.esc(`${profil.name} · ${profil.klasse} · Prüfnummer ${pruefnummer}`)}</w:t>`) +
+      fussRun('<w:tab/><w:t xml:space="preserve">Seite </w:t>') + feld("PAGE") + fussRun('<w:t xml:space="preserve"> von </w:t>') + feld("NUMPAGES") +
+      '</w:p></w:ftr>'],
+    ["word/_rels/document.xml.rels", X + `<Relationships xmlns="${PR}">` +
+      `<Relationship Id="rId1" Type="${R}/styles" Target="styles.xml"/>` +
+      `<Relationship Id="rId2" Type="${R}/settings" Target="settings.xml"/>` +
+      `<Relationship Id="rId3" Type="${R}/footer" Target="footer1.xml"/>` +
+      `<Relationship Id="rId4" Type="${R}/customXml" Target="../customXml/item1.xml"/></Relationships>`],
+    ["customXml/item1.xml", X + `<lernraumProtokoll xmlns="urn:lernraum-protokoll">${textZuBase64(JSON.stringify(paket))}</lernraumProtokoll>`],
+    ["customXml/itemProps1.xml", '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' +
+      `<ds:datastoreItem ds:itemID="${itemId}" xmlns:ds="http://schemas.openxmlformats.org/officeDocument/2006/customXml">` +
+      '<ds:schemaRefs><ds:schemaRef ds:uri="urn:lernraum-protokoll"/></ds:schemaRefs></ds:datastoreItem>'],
+    ["customXml/_rels/item1.xml.rels", X + `<Relationships xmlns="${PR}">` +
+      `<Relationship Id="rId1" Type="${R}/customXmlProps" Target="itemProps1.xml"/></Relationships>`]
+  ];
+  const enc = new TextEncoder();
+  const zip = zipErstellen(teile.map(([name, text]) => ({ name, daten: enc.encode(text) })));
+  return {
+    name: `Lernraum_${dateinameTeil(profil.klasse)}_${dateinameTeil(profil.name)}_${isoDatum()}.docx`,
+    blob: new Blob([zip], { type: DOCX_TYP }),
+    exportiert
+  };
+}
+
+async function wordDateiLesen(datei) {
+  const zip = await zipLesen(new Uint8Array(await dateiPuffer(datei)));
+  const dokument = await zip.text("word/document.xml");
+  if (!dokument) throw new Error("keinWord");
+  let paket = null;
+  for (const n of zip.namen.filter(x => /^customXml\/item\d+\.xml$/i.test(x))) {
+    const m = (await zip.text(n)).match(/<(?:[\w.-]+:)?lernraumProtokoll\b[^>]*>([\s\S]*?)<\/(?:[\w.-]+:)?lernraumProtokoll>/);
+    if (m) { try { paket = JSON.parse(base64ZuText(m[1].replace(/\s+/g, ""))); } catch (e) { paket = null; } break; }
+  }
+  if (!paket || paket.app !== APP_KENNUNG || !paket.profil || !Array.isArray(paket.eintraege)) throw new Error("keineDaten");
+  return {
+    paket,
+    datenGueltig: typeof paket.pruefsumme === "string" && paket.pruefsumme === pruefsummeVon(paket),
+    textGueltig: typeof paket.textSignatur === "string" && paket.textSignatur === sha256(wordText(dokument))
+  };
+}
+function lesefehlerText(err, dateiname) {
+  const code = err && err.message;
+  if (code === "entpacken") return `✗ ${dateiname}: Die Datei wurde neu gespeichert und kann in diesem Browser nicht gelesen werden. Bitte einen aktuellen Browser (Chrome, Edge, Safari) verwenden.`;
+  if (code === "keineDaten") return `✗ ${dateiname}: Keine Protokolldaten gefunden. Die Datei stammt nicht aus dem Lernraum-Protokoll oder wurde in einem anderen Programm (z. B. Pages) neu erstellt.`;
+  return `✗ ${dateiname}: keine lesbare Word-Datei aus dem Lernraum-Protokoll.`;
+}
+
+/* ========================================================================
+   4. ZUSTAND UND DATEN DER LERNENDEN
+   ======================================================================== */
+function laden() {
+  const d = Speicher.lies(SCHLUESSEL, null);
+  const s = (d && typeof d === "object") ? d : {};
+  return {
+    profil: s.profil || null,
+    eintraege: Array.isArray(s.eintraege) ? s.eintraege : [],
+    letzteDatei: s.letzteDatei || null
+  };
+}
+let stand = laden();
+/* Vor jeder Änderung wird neu geladen (laden()), damit zwei offene Tabs sich nicht überschreiben. */
+function sichern() { return Speicher.schreib(SCHLUESSEL, stand); }
+
+const Zustand = {
+  bildschirm: "start",
+  eintragId: null,
+  meldung: null,
+  lehrerOffen: false,
+  lehrerTab: "abgaben",
+  personKey: null,
+  filterVon: "", filterBis: "", filterKlasse: "",
+  ansicht: "liste",
+  importBericht: null,
+  browserOk: false,
+  abgabeLaeuft: false
+};
+
+function eintraegeAm(tag) { return stand.eintraege.filter(e => e.datum === tag); }
+function offeneEintraege() { return stand.eintraege.filter(e => !e.reflexionErfasst).sort(nachZeit); }
+function ohneSatzanfaenge(text) {
+  let rest = text;
+  DATEN.satzanfaenge.forEach(s => { rest = rest.split(s.trim()).join(" "); });
+  return rest.replace(/[\s.…:!?,;-]/g, "");
+}
+function eintragBereinigen(roh) {
+  if (!roh || typeof roh !== "object") return null;
+  const t = v => typeof v === "string" ? v : "";
+  if (!t(roh.id) || !/^\d{4}-\d{2}-\d{2}$/.test(t(roh.datum))) return null;
+  const werte = DATEN.zufriedenheit.map(z => z.wert);
+  return {
+    id: t(roh.id), datum: t(roh.datum), zeitfenster: t(roh.zeitfenster),
+    ziel: t(roh.ziel), zielErfasst: t(roh.zielErfasst),
+    zufrieden: werte.includes(roh.zufrieden) ? roh.zufrieden : null,
+    aendern: t(roh.aendern), bemerkungen: t(roh.bemerkungen),
+    reflexionErfasst: t(roh.reflexionErfasst) || null
+  };
+}
+
+/* Hinweise zur Nachverfolgbarkeit. art "warn" = auffällig, "info" = nur zur Kenntnis.
+   alle = sämtliche Einträge derselben Person (für Doppel-Prüfung). */
+function hinweiseFuer(e, alle = []) {
+  const liste = [];
+  const neu = (art, code, kurz, text) => liste.push({ art, code, kurz, text });
+  const z = zeitfensterVon(e.zeitfenster);
+  const jetzt = Date.now();
+  const nf = DATEN.nachfristMinuten * 60000;
+  const zielZ = new Date(e.zielErfasst).getTime();
+  if (z) {
+    const beginn = zeitpunkt(e.datum, z.beginn), ende = zeitpunkt(e.datum, z.ende);
+    if (zielZ > ende + nf) neu("warn", "zielNach", "Ziel nachgetragen", `Ziel nachgetragen (erfasst ${zeitCH(e.zielErfasst)})`);
+    else if (zielZ < beginn - nf) neu("info", "zielVoraus", "im Voraus", `Ziel im Voraus erfasst (${zeitCH(e.zielErfasst)})`);
+    if (!e.reflexionErfasst) {
+      if (jetzt > ende + nf) neu("warn", "reflFehlt", "Reflexion fehlt", "Reflexion fehlt");
+      else neu("info", "reflOffen", "offen", "Reflexion noch offen");
+    } else if (new Date(e.reflexionErfasst).getTime() > ende + nf) {
+      neu("warn", "reflNach", "Reflexion nachgetragen", `Reflexion nachgetragen (erfasst ${zeitCH(e.reflexionErfasst)})`);
+    }
+  } else {
+    neu("warn", "zfUnbekannt", "Zeitfenster unklar", "Unbekanntes Zeitfenster");
+  }
+  if (e.reflexionErfasst) {
+    const min = Math.round((new Date(e.reflexionErfasst).getTime() - zielZ) / 60000);
+    if (min < DATEN.mindestMinutenBisReflexion) neu("warn", "reflKurz", "Reflexion sehr früh", `Reflexion schon ${min} Min. nach dem Ziel`);
+  }
+  if (alle.filter(x => x.datum === e.datum && x.zeitfenster === e.zeitfenster).length > 1)
+    neu("warn", "doppelt", "doppelt", "Mehrere Einträge für dieses Zeitfenster");
+  else if (alle.filter(x => x.datum === e.datum).length > DATEN.maxEintraegeProTag)
+    neu("warn", "zuViele", "zu viele", "Mehr Einträge an diesem Tag als erlaubt");
+  if (e.ausVeraenderterDatei) neu("warn", "datei", "Daten verändert", "Stammt aus einer veränderten Datei");
+  return liste;
+}
+function warnungen(e, alle) { return hinweiseFuer(e, alle).filter(h => h.art === "warn"); }
+
+/* ========================================================================
+   5. BILDSCHIRME
+   ======================================================================== */
+function zeichnen() {
+  if (!stand.profil && ["start", "ziel", "reflexion", "verlauf"].includes(Zustand.bildschirm))
+    Zustand.bildschirm = "willkommen";
+  buehne.replaceChildren();
+  document.body.classList.toggle("breit",
+    (Zustand.bildschirm === "lehrer" && Zustand.lehrerOffen) || Zustand.bildschirm === "lehrerDetail");
+  kopfZeichnen();
+  const bilder = {
+    willkommen: willkommenBild, start: startBild, ziel: zielBild, reflexion: reflexionBild,
+    verlauf: verlaufBild, lehrer: lehrerBild, lehrerDetail: lehrerDetailBild
+  };
+  (bilder[Zustand.bildschirm] || startBild)();
+  window.scrollTo(0, 0);
+}
+function zurStart() {
+  stand = laden();
+  Zustand.bildschirm = stand.profil ? "start" : "willkommen";
+  zeichnen();
+}
+function kopfZeichnen() {
+  $("#titel").textContent = DATEN.titel;
+  const lehrer = Zustand.bildschirm === "lehrer" || Zustand.bildschirm === "lehrerDetail";
+  $("#untertitel").textContent = lehrer ? "Bereich für die Lehrperson"
+    : (stand.profil ? `${stand.profil.name} · ${stand.profil.klasse}` : "");
+  $("#warnung").replaceChildren(Speicher.dauerhaft ? "" : el("div", { class: "meldung fehler" },
+    "Achtung: In diesem Browser kann nichts gespeichert werden (z. B. im privaten Modus). " +
+    "Einträge gehen beim Schliessen verloren. Öffne die Datei in einem normalen Browserfenster."));
+}
+function meldungAbholen() {
+  const m = Zustand.meldung;
+  Zustand.meldung = null;
+  return m ? el("div", { class: "meldung " + (m.art || ""), role: "status" }, m.text) : null;
+}
+function fehlerFeld() {
+  const f = el("div", { class: "meldung fehler verborgen", role: "alert" });
+  f.zeige = t => { f.textContent = t; f.classList.remove("verborgen"); f.scrollIntoView({ block: "center", behavior: "smooth" }); };
+  f.weg = () => f.classList.add("verborgen");
+  return f;
+}
+
+/* ---------- Willkommen (erster Start) ---------- */
+function appAnleitung() {
+  return el("ol", { class: "schritte" },
+    el("li", {}, "Tippe in Safari auf das Teilen-Symbol (Quadrat mit Pfeil nach oben)."),
+    el("li", {}, "Wähle «Zum Home-Bildschirm» und tippe auf «Hinzufügen»."),
+    el("li", {}, "Schliesse Safari und öffne «Lernraum» auf dem Home-Bildschirm."));
+}
+
+function willkommenBild() {
+  const zurLehrperson = el("div", { class: "fuss nicht-drucken" },
+    el("button", { class: "link", onclick: () => { Zustand.bildschirm = "lehrer"; zeichnen(); } }, "Für die Lehrperson"));
+  if (IST_IOS && !ALS_APP && !Zustand.browserOk) {
+    zeige(el("div", { class: "karte" },
+        el("h2", {}, "Zuerst als App einrichten"),
+        el("p", {}, "Damit deine Einträge sicher gespeichert bleiben, richtest du das Protokoll einmal als App auf deinem iPad ein:"),
+        appAnleitung(),
+        el("p", { class: "meldung warn" }, "Wichtig: Benutze danach immer das Symbol auf dem Home-Bildschirm. " +
+          "Einträge in Safari und in der App sind voneinander getrennt."),
+        el("button", { class: "link", onclick: () => { Zustand.browserOk = true; zeichnen(); } }, "Trotzdem in Safari verwenden")),
+      zurLehrperson);
+    return;
+  }
+  const name = el("input", { type: "text", id: "w-name", autocomplete: "off", maxlength: "60" });
+  const klasse = el("input", { type: "text", id: "w-klasse", autocomplete: "off", maxlength: "20" });
+  const fehler = fehlerFeld();
+  const los = () => {
+    const n = name.value.trim().replace(/\s+/g, " "), k = klasse.value.trim();
+    if (n.length < 2 || !k) return fehler.zeige("Bitte trage deinen Namen und deine Klasse ein.");
+    stand = laden();
+    stand.profil = { name: n, klasse: k, geraetId: neueId(), angelegt: new Date().toISOString() };
+    if (!sichern()) return fehler.zeige("Speichern ist fehlgeschlagen.");
+    Zustand.meldung = { text: `Hallo ${n.split(" ")[0]}! Du kannst jetzt deine Ziele festlegen.` };
+    Zustand.bildschirm = "start";
+    zeichnen();
+  };
+  zeige(
+    el("div", { class: "karte" },
+      el("h2", {}, "Willkommen"),
+      el("p", {}, "Mit diesem Protokoll planst und reflektierst du deine Lernraum-Lektionen:"),
+      el("ol", {},
+        el("li", {}, "Zu Beginn der Lektionen legst du dein Ziel fest."),
+        el("li", {}, "Am Ende der Lektionen füllst du die Reflexion aus."),
+        el("li", {}, "Regelmässig erstellst du eine Word-Datei und gibst sie deiner Lehrperson ab.")),
+      el("p", { class: "gedaempft" }, "Deine Einträge bleiben auf diesem Gerät. Es wird nichts ins Internet geschickt."),
+      el("label", { class: "feldname", for: "w-name" }, "Vor- und Nachname"), name,
+      el("label", { class: "feldname", for: "w-klasse" }, "Klasse"), klasse,
+      el("p", { class: "gedaempft" }, "Name und Klasse kann später nur die Lehrperson ändern."),
+      fehler,
+      el("div", { class: "abstand" }, el("button", { class: "primaer gross", onclick: los }, "Speichern und starten"))),
+    zurLehrperson);
+}
+
+/* ---------- Startseite ---------- */
+function startBild() {
+  stand = laden();
+  if (!stand.profil) { Zustand.bildschirm = "willkommen"; return zeichnen(); }
+  const heute = isoDatum();
+  const amHeute = eintraegeAm(heute);
+  const offen = offeneEintraege()[0];
+  const frei = amHeute.length < DATEN.maxEintraegeProTag &&
+    DATEN.zeitfenster.some(z => !amHeute.some(e => e.zeitfenster === z.id));
+
+  const slots = el("div", { class: "slots" }, DATEN.zeitfenster.map(z => {
+    const e = amHeute.find(x => x.zeitfenster === z.id);
+    const [text, kl] = !e ? ["kein Eintrag", "leer"]
+      : !e.reflexionErfasst ? ["Ziel gesetzt – Reflexion offen", "halb"] : ["erledigt ✓", "fertig"];
+    return el("div", { class: "slot " + kl }, el("b", {}, z.bezeichnung), el("span", {}, text));
+  }));
+
+  const zuZiel = () => { Zustand.bildschirm = "ziel"; zeichnen(); };
+  let aktion;
+  if (offen) {
+    const alt = offen.datum !== heute;
+    aktion = [
+      alt ? el("p", { class: "meldung warn" },
+              `Die Reflexion vom ${datumCH(offen.datum)} (${zfName(offen.zeitfenster)}) fehlt noch. ` +
+              "Fülle sie zuerst aus, dann kannst du neue Ziele festlegen.")
+          : el("p", {}, `Dein Ziel (${zfName(offen.zeitfenster)}) ist gespeichert. Am Ende der Lektionen füllst du die Reflexion aus.`),
+      el("button", { class: "primaer gross", onclick: () => { Zustand.eintragId = offen.id; Zustand.bildschirm = "reflexion"; zeichnen(); } },
+        "Reflexion ausfüllen")
+    ];
+  } else if (frei) {
+    aktion = el("button", { class: "primaer gross", onclick: zuZiel }, "Ziele festlegen");
+  } else {
+    aktion = [
+      el("p", {}, "Für heute ist alles erledigt. Gut gemacht!"),
+      el("button", { onclick: zuZiel }, "Eintrag für einen anderen Tag nachtragen")
+    ];
+  }
+
+  // Erinnerung an die Abgabe-Datei
+  const nichtAbgegeben = stand.eintraege.filter(e =>
+    !stand.letzteDatei || (e.reflexionErfasst || e.zielErfasst) > stand.letzteDatei);
+  let erinnerung = null;
+  if (nichtAbgegeben.length) {
+    const seit = stand.letzteDatei || nichtAbgegeben.map(e => e.zielErfasst).sort()[0];
+    const tage = Math.floor((Date.now() - new Date(seit).getTime()) / 86400000);
+    if (tage >= DATEN.erinnerungNachTagen)
+      erinnerung = el("p", { class: "meldung warn" }, "Du hast schon länger keine Word-Datei mehr abgegeben. Bitte erstelle sie jetzt und gib sie ab.");
+  }
+
+  const safariWarnung = (IST_IOS && !ALS_APP) ? el("details", { class: "meldung warn" },
+    el("summary", {}, "Du benutzt das Protokoll in Safari. Hier können Einträge nach einigen Tagen gelöscht werden. So richtest du es als App ein:"),
+    appAnleitung(),
+    el("p", {}, "Die App startet leer. Gib vorher eine Word-Datei ab – deine Lehrperson kann die Einträge daraus in der App zurückholen.")) : null;
+
+  zeige(
+    meldungAbholen(),
+    safariWarnung,
+    el("div", { class: "karte" },
+      el("h2", {}, `Heute: ${datumLang(heute)}`),
+      slots,
+      aktion),
+    el("div", { class: "karte" },
+      el("h2", {}, "Meine Einträge"),
+      el("p", {}, stand.eintraege.length === 1 ? "1 Eintrag gespeichert." : `${stand.eintraege.length} Einträge gespeichert.`),
+      el("button", { onclick: () => { Zustand.bildschirm = "verlauf"; zeichnen(); } }, "Meine Einträge ansehen")),
+    el("div", { class: "karte" },
+      el("h2", {}, "Abgabe an die Lehrperson"),
+      el("p", {}, IST_IOS
+        ? "Erstelle eine Word-Datei mit all deinen Einträgen. Danach kannst du sie direkt in Teams, OneDrive oder per Mail abgeben oder «In Dateien sichern»."
+        : "Erstelle eine Word-Datei mit all deinen Einträgen und gib sie deiner Lehrperson ab."),
+      el("p", { class: "gedaempft" }, stand.letzteDatei
+        ? `Zuletzt erstellt: ${zeitCH(stand.letzteDatei)}`
+        : "Du hast noch keine Word-Datei erstellt."),
+      erinnerung,
+      el("button", { class: "primaer", onclick: wordAbgeben }, "Word-Datei für die Lehrperson")),
+    el("div", { class: "fuss nicht-drucken" },
+      el("button", { class: "link", onclick: () => { Zustand.bildschirm = "lehrer"; zeichnen(); } }, "Für die Lehrperson")));
+}
+
+/* ---------- Zielsetzung ---------- */
+function einfuegen(feld, text) {
+  const v = feld.value.replace(/\s+$/, "");
+  feld.value = (v ? v + "\n" : "") + text;
+  feld.focus();
+  const ende = feld.value.length;
+  try { feld.setSelectionRange(ende, ende); } catch (e) {}
+  feld.dispatchEvent(new Event("input"));
+}
+
+function zielBild() {
+  stand = laden();
+  if (offeneEintraege().length) { Zustand.bildschirm = "start"; return zeichnen(); }
+  const heute = isoDatum();
+
+  const datumFeld = el("input", { type: "date", id: "z-datum", max: heute, value: heute });
+  const nachtragHinweis = el("p", { class: "meldung warn verborgen" });
+  const vollHinweis = el("p", { class: "meldung warn verborgen" },
+    "Für diesen Tag sind schon alle Einträge erfasst. Wähle ein anderes Datum.");
+  let gewaehlt = null;
+
+  const wahlen = DATEN.zeitfenster.map(z => {
+    const info = el("small", {}, "");
+    const b = el("button", { type: "button", class: "wahl", "aria-pressed": "false", "data-zf": z.id },
+      el("span", {}, z.bezeichnung), info);
+    b.addEventListener("click", () => { gewaehlt = z.id; auffrischen(); });
+    return { z, b, info };
+  });
+
+  function belegtAm(tag) {
+    const liste = eintraegeAm(tag);
+    return { ids: liste.map(e => e.zeitfenster), voll: liste.length >= DATEN.maxEintraegeProTag };
+  }
+  function auffrischen() {
+    const tag = datumFeld.value;
+    const { ids, voll } = belegtAm(tag);
+    let alleBesetzt = true;
+    wahlen.forEach(({ z, b, info }) => {
+      const besetzt = voll || ids.includes(z.id);
+      b.disabled = besetzt;
+      if (besetzt && gewaehlt === z.id) gewaehlt = null;
+      if (!besetzt) alleBesetzt = false;
+      b.setAttribute("aria-pressed", String(gewaehlt === z.id));
+      info.textContent = besetzt ? "bereits erfasst" : "frei";
+    });
+    vollHinweis.classList.toggle("verborgen", !(tag && alleBesetzt));
+    const nachtrag = !!tag && tag < heute;
+    nachtragHinweis.textContent = nachtrag
+      ? `Du trägst einen Eintrag für ${datumLang(tag)} nach. Das wird mit Datum und Uhrzeit vermerkt.` : "";
+    nachtragHinweis.classList.toggle("verborgen", !nachtrag);
+  }
+  /* Vorschlag: heute das laufende (oder nächste) Zeitfenster. Bei anderen Daten bewusst selbst wählen. */
+  function vorschlagen() {
+    const tag = datumFeld.value;
+    const { ids, voll } = belegtAm(tag);
+    const freie = DATEN.zeitfenster.filter(z => !voll && !ids.includes(z.id));
+    gewaehlt = null;
+    if (tag === heute && freie.length) {
+      const jetzt = Date.now();
+      const laufend = freie.find(z => jetzt >= zeitpunkt(tag, z.beginn) && jetzt < zeitpunkt(tag, z.ende));
+      const naechstes = freie.find(z => jetzt < zeitpunkt(tag, z.beginn));
+      gewaehlt = (laufend || naechstes || {}).id || null;
+    }
+    auffrischen();
+  }
+  datumFeld.addEventListener("change", vorschlagen);
+  datumFeld.addEventListener("input", vorschlagen);
+
+  const ziel = el("textarea", { id: "z-ziel", maxlength: "1500",
+    placeholder: "Was willst du in diesen Lektionen erreichen? Woran arbeitest du?" });
+  const zaehler = el("div", { class: "zaehler" });
+  const zaehlen = () => {
+    const n = ziel.value.trim().length;
+    zaehler.textContent = n >= DATEN.mindestZeichenZiel ? "✓" : `${n} / ${DATEN.mindestZeichenZiel} Zeichen`;
+  };
+  ziel.addEventListener("input", zaehlen);
+  zaehlen();
+  const chips = el("div", { class: "chips" }, DATEN.satzanfaenge.map(s =>
+    el("button", { type: "button", class: "chip", onclick: () => einfuegen(ziel, s) }, s.trim() + " …")));
+
+  const fehler = fehlerFeld();
+  ziel.addEventListener("input", () => fehler.weg());
+  datumFeld.addEventListener("change", () => fehler.weg());
+  wahlen.forEach(w => w.b.addEventListener("click", () => fehler.weg()));
+  function speichern() {
+    fehler.weg();
+    const tag = datumFeld.value, text = ziel.value.trim(), heuteJetzt = isoDatum();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(tag)) return fehler.zeige("Wähle ein Datum.");
+    if (tag > heuteJetzt) return fehler.zeige("Das Datum darf nicht in der Zukunft liegen.");
+    if (!gewaehlt) return fehler.zeige("Wähle das Zeitfenster aus.");
+    if (text.length < DATEN.mindestZeichenZiel)
+      return fehler.zeige(`Beschreibe dein Ziel etwas genauer (mindestens ${DATEN.mindestZeichenZiel} Zeichen).`);
+    if (ohneSatzanfaenge(text).length < 5) return fehler.zeige("Ergänze den Satzanfang: Woran genau arbeitest du?");
+    const fenster = gewaehlt;
+    frage(el("div", {},
+        el("p", {}, el("strong", {}, "Ziel speichern?")),
+        el("p", {}, `${datumCH(tag)} · ${zfName(fenster)}`),
+        el("p", { class: "gedaempft" }, "Danach kannst du das Ziel nicht mehr ändern.")),
+      () => {
+        stand = laden();   // frisch laden: vielleicht wurde in einem anderen Tab gespeichert
+        if (offeneEintraege().length) return fehler.zeige("Es ist noch eine Reflexion offen. Fülle sie zuerst aus.");
+        const { ids, voll } = belegtAm(tag);
+        if (voll || ids.includes(fenster)) {
+          auffrischen();
+          return fehler.zeige("Für dieses Datum und Zeitfenster gibt es bereits einen Eintrag.");
+        }
+        stand.eintraege.push({
+          id: neueId(), datum: tag, zeitfenster: fenster, ziel: text,
+          zielErfasst: new Date().toISOString(),
+          zufrieden: null, aendern: "", bemerkungen: "", reflexionErfasst: null
+        });
+        if (!sichern()) { stand = laden(); return fehler.zeige("Speichern ist fehlgeschlagen. Ist der Browserspeicher voll oder gesperrt?"); }
+        Zustand.meldung = { text: "Ziel gespeichert. Am Ende der Lektionen füllst du hier die Reflexion aus." };
+        Zustand.bildschirm = "start";
+        zeichnen();
+      }, "Speichern", "Zurück");
+  }
+
+  zeige(el("div", { class: "karte ohne-polster" },
+    el("div", { class: "band ziel" }, DATEN.texte.zielTitel),
+    el("div", { class: "innen" },
+      el("div", { class: "zwei" },
+        el("div", {}, el("label", { class: "feldname", for: "z-datum" }, "Datum"), datumFeld),
+        el("div", {}, el("span", { class: "feldname" }, "Zeitfenster"), el("div", { class: "wahlen" }, wahlen.map(w => w.b)))),
+      vollHinweis, nachtragHinweis,
+      el("label", { class: "feldname", for: "z-ziel" }, DATEN.texte.planen),
+      chips, ziel, zaehler,
+      fehler,
+      el("div", { class: "zeile abstand" },
+        el("button", { class: "primaer", onclick: speichern }, "Ziel speichern"),
+        el("button", { onclick: zurStart }, "Abbrechen")))));
+  vorschlagen();
+}
+
+/* ---------- Reflexion ---------- */
+function reflexionBild() {
+  stand = laden();
+  const e = stand.eintraege.find(x => x.id === Zustand.eintragId && !x.reflexionErfasst);
+  if (!e) { Zustand.bildschirm = "start"; return zeichnen(); }
+
+  let wahl = null;
+  const knoepfe = DATEN.zufriedenheit.map(z => {
+    const b = el("button", { type: "button", class: "smiley", "aria-pressed": "false", "data-wert": z.wert },
+      svgKnoten(smileySvg(z.wert, 52)), el("span", {}, z.text));
+    b.addEventListener("click", () => {
+      wahl = z.wert;
+      knoepfe.forEach(k => k.setAttribute("aria-pressed", String(k === b)));
+    });
+    return b;
+  });
+  const aendern = el("textarea", { id: "r-aendern", maxlength: "1500",
+    placeholder: "Was machst du beim nächsten Mal anders? Was brauchst du?" });
+  const bemerk = el("textarea", { id: "r-bem", maxlength: "1500", style: "min-height:80px" });
+  const fehler = fehlerFeld();
+  aendern.addEventListener("input", () => fehler.weg());
+  knoepfe.forEach(k => k.addEventListener("click", () => fehler.weg()));
+
+  function speichern() {
+    fehler.weg();
+    if (!wahl) return fehler.zeige("Wähle aus, wie zufrieden du bist.");
+    if (aendern.value.trim().length < DATEN.mindestZeichenAendern)
+      return fehler.zeige("Schreibe auf, was du ändern musst. Wenn nichts: «Nichts.»");
+    const minuten = Math.round((Date.now() - new Date(e.zielErfasst).getTime()) / 60000);
+    const kurz = minuten >= 0 && minuten < DATEN.mindestMinutenBisReflexion;
+    frage(el("div", {},
+        el("p", {}, el("strong", {}, "Reflexion speichern?")),
+        kurz ? el("p", { class: "meldung warn" },
+          `Du hast dein Ziel erst vor ${minuten} Minuten gesetzt. Die Reflexion gehört ans Ende der Lektionen. Das wird vermerkt.`) : null,
+        el("p", { class: "gedaempft" }, "Danach kannst du die Reflexion nicht mehr ändern.")),
+      () => {
+        stand = laden();
+        const x = stand.eintraege.find(y => y.id === e.id);
+        if (!x || x.reflexionErfasst) return zurStart();
+        x.zufrieden = wahl;
+        x.aendern = aendern.value.trim();
+        x.bemerkungen = bemerk.value.trim();
+        x.reflexionErfasst = new Date().toISOString();
+        if (!sichern()) { stand = laden(); return fehler.zeige("Speichern ist fehlgeschlagen."); }
+        Zustand.meldung = { text: "Reflexion gespeichert. Danke!" };
+        Zustand.bildschirm = "start";
+        zeichnen();
+      }, "Speichern", "Zurück");
+  }
+
+  zeige(el("div", { class: "karte ohne-polster" },
+    el("div", { class: "band refl" }, DATEN.texte.reflexionTitel),
+    el("div", { class: "innen" },
+      el("p", { class: "gedaempft", style: "margin-top:12px" }, `${datumLang(e.datum)} · ${zfName(e.zeitfenster)}`),
+      el("span", { class: "feldname" }, "Dein Ziel"),
+      el("div", { class: "zitat" }, e.ziel),
+      el("span", { class: "feldname" }, DATEN.texte.zufrieden),
+      el("div", { class: "smileys" }, knoepfe),
+      el("label", { class: "feldname", for: "r-aendern" }, DATEN.texte.aendern), aendern,
+      el("label", { class: "feldname", for: "r-bem" }, DATEN.texte.bemerkungen + " (freiwillig)"), bemerk,
+      fehler,
+      el("div", { class: "zeile abstand" },
+        el("button", { class: "primaer", onclick: speichern }, "Reflexion speichern"),
+        el("button", { onclick: zurStart }, "Zurück")))));
+}
+
+/* ---------- Protokollkarte (wie Papiervorlage) ---------- */
+function protokollKarte(e, alle) {
+  const z = DATEN.zufriedenheit.find(x => x.wert === e.zufrieden);
+  const hinweise = hinweiseFuer(e, alle);
+  return el("div", { class: "protokoll" },
+    el("div", { class: "k ziel" }, DATEN.texte.zielTitel),
+    el("div", { class: "z2" },
+      el("div", {}, el("span", { class: "lbl" }, "Datum"), datumLang(e.datum)),
+      el("div", {}, el("span", { class: "lbl" }, "Zeitfenster"), zfName(e.zeitfenster))),
+    el("div", { class: "f" },
+      el("span", { class: "lbl" }, DATEN.texte.planen),
+      el("p", { class: "txt" }, e.ziel),
+      el("span", { class: "stempel" }, `erfasst: ${zeitCH(e.zielErfasst)}`)),
+    el("div", { class: "k refl" }, DATEN.texte.reflexionTitel),
+    e.reflexionErfasst ? [
+      el("div", { class: "z2" },
+        el("div", {}, el("span", { class: "lbl" }, DATEN.texte.zufrieden),
+          z ? el("span", {}, svgKnoten(smileySvg(z.wert, 30)), " ", z.text) : "–"),
+        el("div", {}, el("span", { class: "lbl" }, DATEN.texte.aendern), el("p", { class: "txt" }, e.aendern || "–"))),
+      el("div", { class: "f" },
+        el("span", { class: "lbl" }, DATEN.texte.bemerkungen),
+        el("p", { class: "txt" }, e.bemerkungen || "–"),
+        el("span", { class: "stempel" }, `erfasst: ${zeitCH(e.reflexionErfasst)}`))
+    ] : el("div", { class: "f" }, el("p", { class: "txt gedaempft" }, "Noch nicht ausgefüllt.")),
+    hinweise.length ? el("div", { class: "marken" }, hinweise.map(h => el("span", { class: "marke " + h.art }, h.text))) : null);
+}
+
+/* ---------- Meine Einträge ---------- */
+function verlaufBild() {
+  stand = laden();
+  const liste = stand.eintraege.slice().sort(nachZeit).reverse();
+  zeige(
+    el("div", { class: "zeile nicht-drucken", style: "margin-bottom:12px" },
+      el("button", { onclick: zurStart }, "← Zurück"),
+      liste.length && DRUCKEN_MOEGLICH ? el("button", { onclick: () => window.print() }, "Drucken") : null),
+    el("h2", {}, `Meine Einträge (${liste.length})`),
+    el("p", { class: "nur-druck" }, `${DATEN.titel} – ${stand.profil.name} · ${stand.profil.klasse}`),
+    liste.length ? liste.map(e => protokollKarte(e, stand.eintraege))
+                 : el("p", { class: "gedaempft" }, "Noch keine Einträge."));
+}
+
+/* ---------- Abgabe-Datei ---------- */
+async function wordAbgeben() {
+  if (Zustand.abgabeLaeuft) return;
+  stand = laden();
+  if (!stand.profil) return;
+  let datei;
+  try { datei = wordDateiErstellen(); }
+  catch (err) { Zustand.meldung = { art: "fehler", text: "Die Word-Datei konnte nicht erstellt werden." }; return zeichnen(); }
+  Zustand.abgabeLaeuft = true;
+  let geteilt = false;
+  try {
+    const f = new File([datei.blob], datei.name, { type: DOCX_TYP });
+    // Auf dem iPad: Teilen-Menü (Teams, OneDrive, Mail, «In Dateien sichern»). Sonst: normaler Download.
+    if (IST_IOS && navigator.canShare && navigator.canShare({ files: [f] })) {
+      try { await navigator.share({ files: [f], title: datei.name }); geteilt = true; }
+      catch (err) {
+        if (err && err.name === "AbortError") { Zustand.abgabeLaeuft = false; return; }   // abgebrochen: nichts vermerken
+        herunterladen(datei.name, datei.blob, DOCX_TYP);
+      }
+    } else {
+      herunterladen(datei.name, datei.blob, DOCX_TYP);
+    }
+  } finally { Zustand.abgabeLaeuft = false; }
+  stand = laden();
+  stand.letzteDatei = datei.exportiert;
+  sichern();
+  Zustand.meldung = { text: geteilt
+    ? `Die Word-Datei «${datei.name}» wurde weitergegeben.`
+    : `Die Word-Datei «${datei.name}» wurde erstellt (meist im Ordner «Downloads»). Gib sie deiner Lehrperson ab.` };
+  zeichnen();
+}
+
+/* ========================================================================
+   6. BEREICH FÜR DIE LEHRPERSON
+   ======================================================================== */
+function lehrerLager() {
+  const l = Speicher.lies(LEHRER_SCHLUESSEL, null);
+  return (l && l.personen && typeof l.personen === "object") ? l : { personen: {} };
+}
+function imFilter(e) {
+  return (!Zustand.filterVon || e.datum >= Zustand.filterVon) && (!Zustand.filterBis || e.datum <= Zustand.filterBis);
+}
+function gefiltertePersonen() {
+  return Object.entries(lehrerLager().personen)
+    .map(([key, p]) => Object.assign({ key }, p, { sicht: (p.eintraege || []).filter(imFilter).sort(nachZeit) }))
+    .filter(p => !Zustand.filterKlasse || p.klasse === Zustand.filterKlasse)
+    .sort((a, b) => a.klasse.localeCompare(b.klasse, "de-CH") || a.name.localeCompare(b.name, "de-CH"));
+}
+function zufriedenheitsMini(liste) {
+  return el("span", { class: "zmini" }, DATEN.zufriedenheit.map(z =>
+    el("span", {}, svgKnoten(smileySvg(z.wert, 20)), " ", liste.filter(e => e.zufrieden === z.wert).length)));
+}
+function zeigePerson(key) { Zustand.personKey = key; Zustand.bildschirm = "lehrerDetail"; zeichnen(); }
+
+function lehrerBild() {
+  if (!Zustand.lehrerOffen) {
+    const feld = el("input", { type: "password", inputmode: "numeric", autocomplete: "off", id: "pin" });
+    const fehler = el("p", { class: "meldung fehler verborgen" }, "PIN stimmt nicht.");
+    const pruefen = () => {
+      if (feld.value === DATEN.lehrerPin) { Zustand.lehrerOffen = true; zeichnen(); }
+      else { fehler.classList.remove("verborgen"); feld.value = ""; feld.focus(); }
+    };
+    feld.addEventListener("keydown", ev => { if (ev.key === "Enter") pruefen(); });
+    zeige(el("div", { class: "karte" },
+      el("h2", {}, "Für die Lehrperson"),
+      el("label", { class: "feldname", for: "pin" }, "PIN"), feld, fehler,
+      el("div", { class: "zeile abstand" },
+        el("button", { class: "primaer", onclick: pruefen }, "Öffnen"),
+        el("button", { onclick: zurStart }, "Zurück"))));
+    return;
+  }
+  const tab = Zustand.lehrerTab;
+  zeige(
+    el("div", { class: "zeile nicht-drucken", style: "justify-content:space-between;margin-bottom:12px" },
+      el("div", { class: "tabs" },
+        el("button", { "aria-pressed": String(tab === "abgaben"), onclick: () => { Zustand.lehrerTab = "abgaben"; zeichnen(); } }, "Abgaben auswerten"),
+        el("button", { "aria-pressed": String(tab === "geraet"), onclick: () => { Zustand.lehrerTab = "geraet"; zeichnen(); } }, "Dieses Gerät")),
+      el("button", { onclick: () => { Zustand.lehrerOffen = false; zurStart(); } }, "Bereich schliessen")),
+    meldungAbholen());
+  (tab === "geraet" ? geraetTab : abgabenTab)();
+}
+
+/* ---------- Abgaben einlesen und auswerten ---------- */
+function dateiStatus(dateien) {
+  const d = dateien || [];
+  if (d.some(x => !x.gueltig)) return { art: "warn", text: "⚠ Daten verändert" };
+  if (d.some(x => x.textGueltig === false)) return { art: "warn", text: "⚠ Word-Text verändert" };
+  return { art: "ok", text: "✓ unverändert" };
+}
+
+async function einlesenUndZeigen(dateien) {
+  const liste = Array.from(dateien || []);
+  if (!liste.length) return;
+  const lager = lehrerLager();
+  const bericht = [];
+  for (const datei of liste) {
+    try {
+      const { paket: d, datenGueltig, textGueltig } = await wordDateiLesen(datei);
+      const name = String(d.profil.name || "").trim(), klasse = String(d.profil.klasse || "").trim();
+      if (!name) throw new Error("keineDaten");
+      const key = schluesselPerson(name, klasse);
+      const p = lager.personen[key] ||
+        (lager.personen[key] = { name, klasse, geraete: [], dateien: [], eintraege: [], stand: "" });
+      const geraet = String(d.profil.geraetId || "");
+      if (geraet && !p.geraete.includes(geraet)) p.geraete.push(geraet);
+      const exportiert = String(d.exportiert || "");
+      const bekannt = p.dateien.find(x => x.pruefsumme === d.pruefsumme && x.exportiert === exportiert);
+      if (bekannt) bekannt.textGueltig = bekannt.textGueltig !== false && textGueltig;
+      else p.dateien.push({ dateiname: datei.name, exportiert, gueltig: datenGueltig, textGueltig, pruefsumme: String(d.pruefsumme || "") });
+      const neuer = exportiert >= (p.stand || "");
+      if (neuer) { p.stand = exportiert; p.name = name; p.klasse = klasse; }
+      let neu = 0;
+      d.eintraege.forEach(roh => {
+        const e = eintragBereinigen(roh);
+        if (!e) return;
+        e.ausVeraenderterDatei = !datenGueltig;
+        const i = p.eintraege.findIndex(x => x.id === e.id);
+        if (i < 0) { p.eintraege.push(e); neu++; }
+        else if (neuer || (p.eintraege[i].ausVeraenderterDatei && datenGueltig)) p.eintraege[i] = e;
+      });
+      if (!datenGueltig) bericht.push({ art: "warn", text: `⚠ ${name} (${klasse}): Die Protokolldaten in der Datei wurden verändert. Die Einträge sind markiert.` });
+      else if (!textGueltig) bericht.push({ art: "warn", text: `⚠ ${name} (${klasse}): Im Word-Dokument wurde Text verändert. Angezeigt werden die ursprünglichen Einträge.` });
+      else bericht.push({ text: `✓ ${name} (${klasse}): ${d.eintraege.length} Einträge, unverändert` +
+        (bekannt ? " – diese Datei war schon eingelesen" : neu ? `, davon ${neu} neu` : "") });
+    } catch (err) {
+      bericht.push({ art: "fehler", text: lesefehlerText(err, datei.name) });
+    }
+  }
+  if (!Speicher.schreib(LEHRER_SCHLUESSEL, lager))
+    bericht.push({ art: "fehler", text: "Die Auswertung konnte in diesem Browser nicht gespeichert werden." });
+  Zustand.importBericht = bericht;
+  Zustand.lehrerTab = "abgaben";
+  zeichnen();
+}
+
+function abgabenTab() {
+  const eingabe = el("input", { type: "file", accept: `.docx,${DOCX_TYP}`, multiple: "multiple", id: "l-dateien", class: "datei-eingabe" });
+  eingabe.addEventListener("change", () => { const f = Array.from(eingabe.files); eingabe.value = ""; einlesenUndZeigen(f); });
+  const ablage = el("div", { class: "ablage" },
+    el("p", {}, "Gesammelte Word-Dateien der Lernenden hier hineinziehen oder auswählen. Mehrere Dateien auf einmal sind möglich."),
+    el("label", { class: "knopf primaer", for: "l-dateien" }, "Dateien auswählen"), eingabe);
+  ablage.addEventListener("dragover", ev => { ev.preventDefault(); ablage.classList.add("aktiv"); });
+  ablage.addEventListener("dragleave", () => ablage.classList.remove("aktiv"));
+  ablage.addEventListener("drop", ev => { ev.preventDefault(); ablage.classList.remove("aktiv"); einlesenUndZeigen(ev.dataTransfer.files); });
+
+  const bericht = Zustand.importBericht;
+  Zustand.importBericht = null;
+  const personen = Object.values(lehrerLager().personen);
+  const klassen = [...new Set(personen.map(p => p.klasse))].sort((a, b) => a.localeCompare(b, "de-CH"));
+  if (Zustand.filterKlasse && !klassen.includes(Zustand.filterKlasse)) Zustand.filterKlasse = "";
+
+  zeige(el("div", { class: "karte nicht-drucken" },
+    el("h2", {}, "Abgaben einlesen"),
+    ablage,
+    bericht ? bericht.map(b => el("p", { class: "meldung " + (b.art || "") }, b.text)) : null,
+    el("p", { class: "gedaempft" }, "Die Word-Dateien werden nur in diesem Browser ausgewertet. Es wird nichts hochgeladen. " +
+      "Geprüft wird, ob Daten oder Text im Word nachträglich verändert wurden. Dieselbe Datei nochmals einzulesen schadet nicht; " +
+      "neuere Dateien ergänzen die älteren. Die Word-Dateien bleiben das Original, diese Übersicht ist nur eine Hilfe.")));
+  if (!personen.length) return;
+
+  // Filter werden nicht neu gezeichnet – nur der Ergebnisbereich (sonst verliert das Datumsfeld den Fokus)
+  const ergebnis = el("div");
+  const auffrischen = () => ergebnisZeichnen(ergebnis);
+  const von = el("input", { type: "date", id: "f-von", value: Zustand.filterVon });
+  const bis = el("input", { type: "date", id: "f-bis", value: Zustand.filterBis });
+  von.addEventListener("change", () => { Zustand.filterVon = von.value; auffrischen(); });
+  bis.addEventListener("change", () => { Zustand.filterBis = bis.value; auffrischen(); });
+  const klasseWahl = el("select", { id: "f-klasse" },
+    el("option", { value: "" }, "Alle Klassen"), klassen.map(k => el("option", { value: k }, k)));
+  klasseWahl.value = Zustand.filterKlasse;
+  klasseWahl.addEventListener("change", () => { Zustand.filterKlasse = klasseWahl.value; auffrischen(); });
+  const ansichtKnoepfe = [["liste", "Liste"], ["raster", "Raster nach Datum"]].map(([wert, text]) => {
+    const b = el("button", { "aria-pressed": String(Zustand.ansicht === wert) }, text);
+    b.addEventListener("click", () => {
+      Zustand.ansicht = wert;
+      ansichtKnoepfe.forEach(k => k.setAttribute("aria-pressed", String(k === b)));
+      auffrischen();
+    });
+    return b;
+  });
+
+  zeige(el("div", { class: "karte" },
+    el("h2", {}, "Übersicht"),
+    el("div", { class: "filter nicht-drucken" },
+      el("div", {}, el("label", { class: "feldname", for: "f-klasse" }, "Klasse"), klasseWahl),
+      el("div", {}, el("label", { class: "feldname", for: "f-von" }, "Von"), von),
+      el("div", {}, el("label", { class: "feldname", for: "f-bis" }, "Bis"), bis)),
+    el("div", { class: "tabs abstand nicht-drucken", style: "margin-bottom:12px" }, ansichtKnoepfe),
+    ergebnis,
+    el("div", { class: "zeile abstand nicht-drucken" },
+      el("button", { onclick: csvExport }, "Einträge als CSV (Excel)"),
+      DRUCKEN_MOEGLICH ? el("button", { onclick: () => window.print() }, "Übersicht drucken") : null,
+      el("button", { onclick: () => frage("Alle eingelesenen Abgaben aus dieser Auswertung entfernen? Die Dateien selbst bleiben erhalten.",
+        () => { Speicher.loesche(LEHRER_SCHLUESSEL); Zustand.meldung = { text: "Die Auswertung wurde geleert." }; zeichnen(); }, "Entfernen") },
+        "Eingelesene Daten entfernen"))));
+  auffrischen();
+}
+
+function ergebnisZeichnen(bereich) {
+  const personen = gefiltertePersonen();
+  if (!personen.length) return bereich.replaceChildren(el("p", { class: "gedaempft" }, "Keine Lernenden für diese Auswahl."));
+  if (Zustand.ansicht === "raster") return bereich.replaceChildren(...rasterAnsicht(personen));
+
+  const spalten = ["Name", "Klasse", "Einträge", "Reflexion fehlt", "Hinweise", "Zufriedenheit", "Letzte Datei", "Word-Datei"];
+  const kopf = el("tr", {}, spalten.map((t, i) => el("th", { class: i >= 2 && i <= 4 ? "zahl" : "" }, t)));
+  const zeilen = personen.map(p => {
+    const s = p.sicht;
+    const fehlt = s.filter(e => !e.reflexionErfasst).length;
+    const warn = s.reduce((n, e) => n + warnungen(e, p.eintraege).length, 0);
+    const letzte = (p.dateien || []).map(d => d.exportiert).sort().pop();
+    const status = dateiStatus(p.dateien);
+    return el("tr", {},
+      el("td", {}, el("button", { class: "link", onclick: () => zeigePerson(p.key) }, p.name)),
+      el("td", {}, p.klasse),
+      el("td", { class: "zahl" }, s.length),
+      el("td", { class: "zahl" }, fehlt || "–"),
+      el("td", { class: "zahl" }, warn ? el("span", { class: "marke warn" }, warn) : "–"),
+      el("td", {}, zufriedenheitsMini(s)),
+      el("td", {}, letzte ? zeitCH(letzte) : "–"),
+      el("td", {}, el("span", { class: "marke " + status.art }, status.text)));
+  });
+  bereich.replaceChildren(
+    el("div", { class: "tabelle-huelle" }, el("table", {}, el("thead", {}, kopf), el("tbody", {}, zeilen))),
+    el("p", { class: "gedaempft" }, "Namen antippen, um alle Einträge zu sehen. «Hinweise» zählt nachgetragene, verspätete, " +
+      "auffällig schnelle oder doppelte Einträge sowie fehlende Reflexionen."));
+}
+
+function rasterAnsicht(personen) {
+  const tage = [...new Set(personen.flatMap(p => p.sicht.map(e => e.datum)))].sort();
+  if (!tage.length) return [el("p", { class: "gedaempft" }, "Keine Einträge im gewählten Zeitraum.")];
+  const kopf = el("tr", {}, el("th", {}, "Name"), tage.map(t => el("th", { class: "zahl" }, kurzDatum(t))));
+  const zeilen = personen.map(p => el("tr", {},
+    el("td", {}, el("button", { class: "link", onclick: () => zeigePerson(p.key) }, p.name),
+      el("div", { class: "gedaempft" }, p.klasse)),
+    tage.map(t => el("td", { class: "zahl" }, DATEN.zeitfenster.map(z => {
+      const e = p.sicht.find(x => x.datum === t && x.zeitfenster === z.id);
+      if (!e) return el("span", { class: "r r-leer" }, `${z.kurz} –`);
+      const offen = !e.reflexionErfasst;
+      const auffaellig = warnungen(e, p.eintraege).some(h => h.code !== "reflFehlt");
+      return el("span", { class: `r ${offen ? "r-halb" : "r-fertig"}${auffaellig ? " r-warn" : ""}` },
+        `${z.kurz} ${offen ? "◐" : "✓"}${auffaellig ? "!" : ""}`);
+    })))));
+  return [
+    el("div", { class: "tabelle-huelle" }, el("table", { class: "raster" }, el("thead", {}, kopf), el("tbody", {}, zeilen))),
+    el("p", { class: "gedaempft" },
+      "Legende: ✓ Ziel und Reflexion erfasst · ◐ Reflexion fehlt · – kein Eintrag · ! Hinweis (nachgetragen, verspätet, sehr schnell oder doppelt) · " +
+      DATEN.zeitfenster.map(z => `${z.kurz} = ${z.bezeichnung}`).join(" · "))
+  ];
+}
+
+function csvExport() {
+  const zeilen = [["Klasse", "Name", "Datum", "Zeitfenster", DATEN.texte.planen.replace(/\s*…$/, ""), "Ziel erfasst",
+    "Zufrieden", DATEN.texte.aendern, DATEN.texte.bemerkungen, "Reflexion erfasst", "Hinweise", "Word-Datei"]];
+  gefiltertePersonen().forEach(p => {
+    const status = dateiStatus(p.dateien).text.replace(/^[✓⚠]\s*/, "");
+    p.sicht.forEach(e => {
+      const z = DATEN.zufriedenheit.find(x => x.wert === e.zufrieden);
+      zeilen.push([p.klasse, p.name, datumCH(e.datum), zfName(e.zeitfenster), e.ziel, zeitCH(e.zielErfasst),
+        z ? z.text : "", e.aendern || "", e.bemerkungen || "", e.reflexionErfasst ? zeitCH(e.reflexionErfasst) : "",
+        hinweiseFuer(e, p.eintraege).map(h => h.text).join(" | "), status]);
+    });
+  });
+  csvHerunterladen(`Lernraum_Auswertung_${isoDatum()}.csv`, zeilen);
+}
+
+/* ---------- Detail einer Person ---------- */
+function lehrerDetailBild() {
+  if (!Zustand.lehrerOffen) { Zustand.bildschirm = "lehrer"; return zeichnen(); }
+  const p = lehrerLager().personen[Zustand.personKey];
+  const zurueck = () => { Zustand.bildschirm = "lehrer"; zeichnen(); };
+  if (!p) return zurueck();
+  const alle = p.eintraege || [];
+  const sicht = alle.filter(imFilter).sort(nachZeit);
+  const fehlt = sicht.filter(e => !e.reflexionErfasst).length;
+  const warn = sicht.reduce((n, e) => n + warnungen(e, alle).length, 0);
+  const zeitraum = (Zustand.filterVon || Zustand.filterBis)
+    ? ` im Zeitraum ${Zustand.filterVon ? datumCH(Zustand.filterVon) : "…"} bis ${Zustand.filterBis ? datumCH(Zustand.filterBis) : "…"}` : "";
+  zeige(
+    el("div", { class: "zeile nicht-drucken", style: "margin-bottom:12px" },
+      el("button", { onclick: zurueck }, "← Zur Übersicht"),
+      DRUCKEN_MOEGLICH ? el("button", { onclick: () => window.print() }, "Drucken") : null),
+    el("div", { class: "karte" },
+      el("h2", {}, `${p.name} · ${p.klasse}`),
+      el("p", {}, `${sicht.length} Einträge${zeitraum} · Reflexion fehlt: ${fehlt} · Hinweise: ${warn}`),
+      zufriedenheitsMini(sicht),
+      el("h3", { class: "nicht-drucken" }, "Eingelesene Word-Dateien"),
+      el("ul", { class: "nicht-drucken" }, (p.dateien || []).slice().sort((a, b) => a.exportiert < b.exportiert ? -1 : 1).map(d =>
+        el("li", {}, `${d.dateiname} (gespeichert ${zeitCH(d.exportiert)}) `,
+          (s => el("span", { class: "marke " + s.art }, s.text))(dateiStatus([d]))))),
+      (p.dateien || []).some(d => d.gueltig && d.textGueltig === false) ? el("p", { class: "meldung warn nicht-drucken" },
+        "In mindestens einer Word-Datei wurde Text nachträglich verändert. Unten stehen die ursprünglichen Einträge – " +
+        "vergleiche bei Bedarf mit dem Word-Dokument.") : null,
+      (p.geraete || []).length > 1 ? el("p", { class: "meldung warn nicht-drucken" },
+        `Die Einträge stammen von ${p.geraete.length} verschiedenen Geräten oder Browsern. ` +
+        "Das kann harmlos sein (neues Gerät), aber auch bedeuten, dass neu begonnen wurde.") : null),
+    sicht.length ? sicht.map(e => protokollKarte(e, alle)) : el("p", { class: "gedaempft" }, "Keine Einträge im gewählten Zeitraum."));
+}
+
+/* ---------- Verwaltung dieses Geräts ---------- */
+function geraetTab() {
+  stand = laden();
+
+  // Profil
+  const name = el("input", { type: "text", id: "g-name", maxlength: "60" });
+  const klasse = el("input", { type: "text", id: "g-klasse", maxlength: "20" });
+  name.value = stand.profil ? stand.profil.name : "";
+  klasse.value = stand.profil ? stand.profil.klasse : "";
+  const profilMeldung = el("p", { class: "meldung verborgen" });
+  const profilSpeichern = () => {
+    const n = name.value.trim().replace(/\s+/g, " "), k = klasse.value.trim();
+    if (n.length < 2 || !k) { profilMeldung.className = "meldung fehler"; profilMeldung.textContent = "Name und Klasse ausfüllen."; return; }
+    stand = laden();
+    stand.profil = Object.assign({ geraetId: neueId(), angelegt: new Date().toISOString() }, stand.profil || {}, { name: n, klasse: k });
+    sichern();
+    profilMeldung.className = "meldung";
+    profilMeldung.textContent = "Profil gespeichert.";
+  };
+
+  // Einträge
+  const liste = stand.eintraege.slice().sort(nachZeit).reverse();
+  const eintragsTabelle = liste.length ? el("div", { class: "tabelle-huelle" }, el("table", {}, el("tbody", {}, liste.map(e =>
+    el("tr", {},
+      el("td", {}, datumCH(e.datum)),
+      el("td", {}, zfName(e.zeitfenster)),
+      el("td", {}, e.reflexionErfasst ? "erledigt" : "Reflexion offen"),
+      el("td", { class: "gedaempft" }, kuerzen(e.ziel, 60)),
+      el("td", {}, el("button", { class: "klein", onclick: () => frage(
+        `Eintrag vom ${datumCH(e.datum)} (${zfName(e.zeitfenster)}) auf diesem Gerät endgültig löschen?`,
+        () => {
+          stand = laden();
+          stand.eintraege = stand.eintraege.filter(x => x.id !== e.id);
+          sichern();
+          Zustand.meldung = { text: "Eintrag gelöscht." };
+          zeichnen();
+        }, "Löschen") }, "Löschen"))))))) : el("p", { class: "gedaempft" }, "Keine Einträge auf diesem Gerät.");
+
+  // Sicherung zurückspielen
+  const sicherung = el("input", { type: "file", accept: `.docx,${DOCX_TYP}`, id: "g-sicherung", class: "datei-eingabe" });
+  sicherung.addEventListener("change", async () => {
+    const datei = sicherung.files[0];
+    sicherung.value = "";
+    if (!datei) return;
+    const melde = (art, text) => { Zustand.meldung = { art, text }; zeichnen(); };
+    try {
+      let gelesen;
+      try { gelesen = await wordDateiLesen(datei); }
+      catch (err) { return melde("fehler", lesefehlerText(err, datei.name).replace(/^✗\s*/, "")); }
+      const d = gelesen.paket;
+      if (!gelesen.datenGueltig) return melde("fehler", "Die Protokolldaten in der Datei wurden verändert. Sie können nicht übernommen werden.");
+      stand = laden();
+      if (stand.profil && schluesselPerson(stand.profil.name, stand.profil.klasse) !== schluesselPerson(d.profil.name, d.profil.klasse))
+        return melde("fehler", `Die Datei gehört zu «${d.profil.name}, ${d.profil.klasse}». Auf diesem Gerät ist «${stand.profil.name}, ${stand.profil.klasse}» angelegt.`);
+      if (!stand.profil) stand.profil = { name: String(d.profil.name), klasse: String(d.profil.klasse), geraetId: neueId(), angelegt: new Date().toISOString() };
+      let neu = 0, belegt = 0;
+      d.eintraege.forEach(roh => {
+        const e = eintragBereinigen(roh);
+        if (!e || stand.eintraege.some(x => x.id === e.id)) return;
+        if (stand.eintraege.some(x => x.datum === e.datum && x.zeitfenster === e.zeitfenster)) { belegt++; return; }
+        stand.eintraege.push(e); neu++;
+      });
+      sichern();
+      melde("", `Sicherung übernommen: ${neu} Einträge ergänzt` + (belegt ? `, ${belegt} übersprungen (Zeitfenster schon belegt).` : "."));
+    } catch (err) { melde("fehler", "Die Word-Datei kann nicht gelesen werden."); }
+  });
+
+  zeige(
+    el("div", { class: "karte" },
+      el("h2", {}, "Profil auf diesem Gerät"),
+      stand.profil ? null : el("p", { class: "gedaempft" }, "Auf diesem Gerät ist noch kein Profil angelegt."),
+      el("div", { class: "zwei" },
+        el("div", {}, el("label", { class: "feldname", for: "g-name" }, "Vor- und Nachname"), name),
+        el("div", {}, el("label", { class: "feldname", for: "g-klasse" }, "Klasse"), klasse)),
+      profilMeldung,
+      el("div", { class: "abstand" }, el("button", { class: "primaer", onclick: profilSpeichern }, "Profil speichern"))),
+    el("div", { class: "karte" },
+      el("h2", {}, `Einträge auf diesem Gerät (${liste.length})`),
+      el("p", { class: "gedaempft" }, "Hier löschst du einen falsch erfassten Eintrag, z. B. bei falschem Datum. " +
+        "Lernende können Einträge nicht selbst ändern. Bereits abgegebene Dateien bleiben unverändert."),
+      eintragsTabelle),
+    el("div", { class: "karte" },
+      el("h2", {}, "Sicherung und Zurücksetzen"),
+      el("p", {}, "Sind die Einträge verloren gegangen (z. B. neues iPad, App neu eingerichtet), kann die zuletzt abgegebene Word-Datei wieder eingelesen werden. Die Einträge werden ergänzt."),
+      el("label", { class: "knopf", for: "g-sicherung" }, "Word-Datei einlesen"), sicherung,
+      el("hr"),
+      el("p", {}, "Neues Schuljahr oder Gerät weitergeben: alle Einträge und das Profil auf diesem Gerät löschen."),
+      el("div", { class: "zeile" },
+        stand.profil ? el("button", { onclick: wordAbgeben }, "Zuerst Word-Datei erstellen") : null,
+        el("button", { onclick: () => frage("Wirklich alle Einträge und das Profil auf diesem Gerät löschen? Das kann nicht rückgängig gemacht werden.",
+          () => { Speicher.loesche(SCHLUESSEL); stand = laden(); Zustand.meldung = { text: "Alle Daten auf diesem Gerät wurden gelöscht." }; zeichnen(); },
+          "Alles löschen") }, "Alle Daten auf diesem Gerät löschen"))));
+}
+
+/* ========================================================================
+   7. START
+   ======================================================================== */
+window.addEventListener("storage", ev => {
+  if (ev.key === SCHLUESSEL && ["start", "verlauf"].includes(Zustand.bildschirm)) zeichnen();
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && Zustand.bildschirm === "start") zeichnen();
+});
+document.title = DATEN.titel;
+if (IM_WEB) {
+  // Nur wenn die App über eine Webadresse läuft: Manifest und Offline-Speicher (sw.js) für den Home-Bildschirm
+  const m = document.createElement("link");
+  m.rel = "manifest"; m.href = "manifest.webmanifest";
+  document.head.append(m);
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+Zustand.bildschirm = stand.profil ? "start" : "willkommen";
+zeichnen();
+</script>
+</body>
+</html>
